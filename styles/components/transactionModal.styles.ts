@@ -122,6 +122,7 @@ export default StyleSheet.create({
         paddingTop: 16,
         paddingBottom: 24,
         elevation: 6,
+        maxHeight: '95%',
     },
     sheetTitle: { fontSize: 16, fontWeight: '700', color: '#111', marginTop: '2%', marginBottom: 8 },
     button: {

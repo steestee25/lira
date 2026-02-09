@@ -15,17 +15,6 @@ export interface Question {
 }
 
 export const onboardingQuestions: Question[] = [
-    // ---------------- 2.1 LANGUAGE ----------------
-    {
-        key: 'language',
-        title: 'In which language do you prefer to receive answers?',
-        options: [
-            { label: 'Italiano', value: 'it' },
-            { label: 'English', value: 'en' },
-        ],
-        answer: null,
-    },
-
     // ---------------- 2.1 CONTEXT ----------------
     {
         key: 'context',
@@ -36,6 +25,30 @@ export const onboardingQuestions: Question[] = [
             { label: 'Freelancer / Entrepreneur', value: 'freelancer' },
             { label: 'Looking for a job', value: 'jobseeker' },
             { label: 'Other', value: 'other' },
+        ],
+        answer: null,
+    },
+
+    {
+        key: 'money_management',
+        title: 'How do you currently manage your personal finances?',
+        options: [
+            {
+                label: 'I don\'t really track them',
+                value: 'no_tracking',
+            },
+            {
+                label: 'I track expenses informally (notes, memory)',
+                value: 'informal_tracking',
+            },
+            {
+                label: 'I use spreadsheets or budgeting apps',
+                value: 'structured_tracking',
+            },
+            {
+                label: 'I actively plan and review my finances',
+                value: 'active_planning',
+            },
         ],
         answer: null,
     },
@@ -110,6 +123,53 @@ export const onboardingQuestions: Question[] = [
         correctAnswer: '1630',
     },
 
+
+    {
+        key: 'quiz4',
+        title:
+            'If inflation is consistently higher than the interest rate on your savings account, what is the main consequence over time?',
+        options: [
+            {
+                label: 'Your money loses real value, even if the balance increases',
+                value: 'lose_real_value',
+            },
+            {
+                label: 'Your money keeps the same purchasing power',
+                value: 'same_power',
+            },
+            {
+                label: 'You only lose money if the balance goes down',
+                value: 'lose_only_if_down',
+            },
+            { label: "I don't know", value: 'unknown' },
+        ],
+        answer: null,
+        correctAnswer: 'lose_real_value',
+    },
+
+    {
+        key: 'quiz5',
+        title:
+            'In which situation does diversification help the least?',
+        options: [
+            {
+                label: 'When assets are highly correlated',
+                value: 'high_correlation',
+            },
+            {
+                label: 'When investing for the long term',
+                value: 'long_term',
+            },
+            {
+                label: 'When investing small amounts regularly',
+                value: 'small_amounts',
+            },
+            { label: "I don't know", value: 'unknown' },
+        ],
+        answer: null,
+        correctAnswer: 'high_correlation',
+    },
+
     // ---------------- 2.3 GOALS, TIME, MONEY, RISK ----------------
     {
         key: 'goal',
@@ -122,7 +182,7 @@ export const onboardingQuestions: Question[] = [
             { label: 'Other', value: 'other' },
         ],
         answer: [],
-        multiple: true,  
+        multiple: true,
     },
 
     {
@@ -141,8 +201,8 @@ export const onboardingQuestions: Question[] = [
         title: 'Which range best describes your monthly net income?',
         options: [
             { label: '< €1,000', value: 'lt_1000' },
-            { label: '€1,000–2,000', value: '1000_2000' },
-            { label: '€2,000–3,000', value: '2000_3000' },
+            { label: '€1,000-2,000', value: '1000_2000' },
+            { label: '€2,000-3,000', value: '2000_3000' },
             { label: '> €3,000', value: 'gt_3000' },
             { label: 'Prefer not to say', value: 'no_answer' },
         ],
@@ -154,10 +214,11 @@ export const onboardingQuestions: Question[] = [
         title:
             'How much do you usually save monthly (as % of your net income)?',
         options: [
-            { label: '0–5%', value: '0_5' },
-            { label: '5–15%', value: '5_15' },
-            { label: '15–30%', value: '15_30' },
+            { label: '0-5%', value: '0_5' },
+            { label: '5-15%', value: '5_15' },
+            { label: '15-30%', value: '15_30' },
             { label: '>30%', value: 'gt_30' },
+            { label: 'I don\'t know precisely', value: 'dk' },
         ],
         answer: null,
     },
