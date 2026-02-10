@@ -162,9 +162,9 @@ export default function PasswordStep({
         </TouchableOpacity>
 
         <View style={styles.signupPrompt}>
-          <Text style={styles.signupText}>Don't have an account? </Text>
+          <Text style={styles.signupText}>{t('auth.passwordStep.noAccount')}</Text>
           <TouchableOpacity onPress={handleSignUp} disabled={loading}>
-            <Text style={styles.signupLink}>Sign up</Text>
+            <Text style={styles.signupLink}> {t('auth.passwordStep.signUp')}</Text>
           </TouchableOpacity>
         </View>
       </Animated.View>

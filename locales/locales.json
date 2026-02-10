@@ -36,7 +36,9 @@
             },
             "passwordStep": {
                 "title": "Choose a password",
-                "buttonNext": "Next"
+                "buttonNext": "Next",
+                "noAccount": "Don't have an account?",
+                "signUp": "Sign up"
             }
         },
         "home":{
@@ -137,7 +139,9 @@
             },
             "passwordStep": {
                 "title": "Scegli una password",
-                "buttonNext": "Avanti"
+                "buttonNext": "Avanti",
+                "noAccount": "Non hai un account?",
+                "signUp": "Iscriviti"
             }
         },
         "home":{
