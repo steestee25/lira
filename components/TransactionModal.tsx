@@ -88,9 +88,10 @@ export default function TransactionModal({
         <Modal visible={visible} animationType="slide" transparent statusBarTranslucent={true} onRequestClose={onCancel}>
             <View style={styles.modalOverlay}>
                 <Pressable style={styles.overlayFill} onPress={onCancel} />
-                <View style={styles.bottomSheet}>
+                <View style={[styles.bottomSheet, showDatePicker && { paddingBottom: 5 }] }>
                     {/* Top row: small x */}
                     <View style={styles.topRow}>
+                        <Text style={styles.sheetTitle}>{(t ? t(isIncome ? (mode === "add" ? 'transactionModal.addIncomeTitle' : 'transactionModal.editIncomeTitle') : (mode === "add" ? 'transactionModal.addTitle' : 'transactionModal.editTitle')) : (isIncome ? (mode === "add" ? 'Nuova entrata' : 'Modifica entrata') : (mode === "add" ? 'Nuova transazione' : 'Modifica transazione')))}</Text>
                         <View style={styles.iconClose}>
                             <TouchableOpacity onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch (e) { }; onCancel(); }}>
                                 <Ionicons name="close" size={20} color="#333" />
@@ -98,11 +99,11 @@ export default function TransactionModal({
                         </View>
                     </View>
 
-                    <ScrollView showsVerticalScrollIndicator={true} contentContainerStyle={{ paddingBottom: 20 }}>
+                    <ScrollView showsVerticalScrollIndicator={true} contentContainerStyle={{ paddingBottom: showDatePicker ? 8 : 20 }}>
                         {/* Expenses/Income selector */}
                         <View style={{
                             flexDirection: 'row', borderRadius: 35,
-                            backgroundColor: '#faf9f9ff', padding: 4, marginBottom: 15
+                            backgroundColor: '#faf9f9ff', padding: 4, marginBottom: 5
                         }}>
                             <TouchableOpacity
                                 onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch (e) { }; setIsIncome(false); }}
@@ -182,7 +183,7 @@ export default function TransactionModal({
                             />
                         </View>
 
-                        <View style={{ marginBottom: 15 }}>
+                        <View style={{ marginBottom: 5 }}>
                             <View style={styles.dateRow}>
                                 <Text style={styles.amountLabel}>{t('transactionModal.date')}</Text>
                                 <TouchableOpacity style={styles.dateButton} onPress={async () => { try { await Haptics.selectionAsync(); } catch (e) { }; setShowDatePicker(true); }}>
@@ -212,16 +213,16 @@ export default function TransactionModal({
                                 />
                             )}
                         </View>
-
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity
-                                style={styles.button}
-                                onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch (e) { }; handleSave(); }}
-                            >
-                                <Text style={styles.buttonText}>{mode === "add" ? t('transactionModal.add') : t('common.save')}</Text>
-                            </TouchableOpacity>
-                        </View>
                     </ScrollView>
+
+                    <View style={[styles.buttonContainer, showDatePicker && { marginTop: 6, marginBottom: 12 }]}>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch (e) { }; handleSave(); }}
+                        >
+                            <Text style={styles.buttonText}>{mode === "add" ? t('transactionModal.add') : t('common.save')}</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         </Modal>

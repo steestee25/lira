@@ -124,7 +124,7 @@ export default StyleSheet.create({
         elevation: 6,
         maxHeight: '95%',
     },
-    sheetTitle: { fontSize: 16, fontWeight: '700', color: '#111', marginTop: '2%', marginBottom: 8 },
+    sheetTitle: { fontSize: 22, fontWeight: '700', color: '#111', marginTop: 0, marginBottom: 0, flex: 1, textAlign: 'left' },
     button: {
         backgroundColor: COLORS.primaryLight,
         padding: 15,
@@ -150,9 +150,10 @@ export default StyleSheet.create({
     },
     topRow: {
         flexDirection: 'row',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 15,
+        marginBottom: 12,
+        paddingHorizontal: 6,
     },
     iconClose: {
         width: 40,

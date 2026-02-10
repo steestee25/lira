@@ -99,7 +99,9 @@
         },
         "transactionModal": {
             "addTitle": "Add Transaction",
+            "addIncomeTitle": "Add Income",
             "editTitle": "Edit Transaction",
+            "editIncomeTitle": "Edit Income",
             "namePlaceholder": "Transaction Name",
             "expense": "Expense",
             "income": "Income",
@@ -206,7 +208,9 @@
         },
         "transactionModal": {
             "addTitle": "Aggiungi transazione",
+            "addIncomeTitle": "Aggiungi entrata",
             "editTitle": "Modifica transazione",
+            "editIncomeTitle": "Modifica entrata",
             "namePlaceholder": "Nome transazione",
             "expense": "Spese",
             "income": "Entrate",
