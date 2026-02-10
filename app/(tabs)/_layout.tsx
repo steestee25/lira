@@ -31,8 +31,9 @@ export default function TabLayout() {
                 tabBarStyle: {
                     position: 'absolute',
                     marginHorizontal: 10,
-                    bottom: 20,
-                    borderRadius: 30,
+                    bottom: 25,
+                    height: 65,
+                    borderRadius: 35,
                     backgroundColor: COLORS.white,
                     shadowColor: '#000',
                 },
@@ -69,8 +70,8 @@ export default function TabLayout() {
                     headerRight: () => (
                         <View style={styles.headerRightContainer}>
                             <HeaderButton onPress={handleNewMessage}>
-                                <MaterialCommunityIcons name="shape-square-rounded-plus" 
-                                size={28} color={COLORS.temp3} />
+                                <MaterialCommunityIcons name="shape-square-rounded-plus"
+                                    size={28} color={COLORS.temp3} />
                             </HeaderButton>
                             <HeaderButton style={{ marginLeft: 12 }} onPress={() => { /* more */ }}>
                                 <Entypo name="dots-three-vertical" size={20} color={COLORS.temp3} />
