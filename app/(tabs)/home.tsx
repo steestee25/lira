@@ -209,11 +209,11 @@ export default function Index() {
         }
       });
 
-      const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthLabels = t('home.months');
       const chart = Object.entries(monthsData).map(([monthKey, total]) => {
         const [year, month] = monthKey.split('-');
         const monthIndex = parseInt(month) - 1;
-        return { value: Math.round(total), label: monthLabels[monthIndex] };
+        return { value: Math.round(total), label: monthLabels[monthIndex] }; 
       });
 
       const chartDataWithColors = chart.map((item, index) => ({

@@ -85,7 +85,7 @@ export default function TransactionModal({
     };
 
     return (
-        <Modal visible={visible} animationType="slide" transparent onRequestClose={onCancel}>
+        <Modal visible={visible} animationType="slide" transparent statusBarTranslucent={true} onRequestClose={onCancel}>
             <View style={styles.modalOverlay}>
                 <Pressable style={styles.overlayFill} onPress={onCancel} />
                 <View style={styles.bottomSheet}>

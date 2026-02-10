@@ -45,7 +45,7 @@ export const styles = StyleSheet.create({
   },
   recapCardExpensesContainer: {
     left: '5%',
-    marginBottom: '10%',
+    marginBottom: '20%',
   },
   selectedValueText: {
     position: 'absolute',

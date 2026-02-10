@@ -42,7 +42,8 @@
             }
         },
         "home":{
-            "greeting": "Hello, {name}!"
+            "greeting": "Hello, {name}!",
+            "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         },
         "settings": {
             "title": "Settings",
@@ -145,7 +146,8 @@
             }
         },
         "home":{
-            "greeting": "Ciao, {name}!"
+            "greeting": "Ciao, {name}!",
+            "months": ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"]
         },
         "settings": {
             "title": "Impostazioni",
