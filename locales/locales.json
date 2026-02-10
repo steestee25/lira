@@ -21,6 +21,13 @@
             "loading": "Loading...",
             "welcome": "Welcome to YourMoney"
         },
+        "errorDialog": {
+            "title": "Oops!",
+            "ok": "OK"
+        },
+        "errors": {
+            "Invalid login credentials": "Invalid login credentials"
+        },
         "auth": {
             "initialStep": {
                 "buttonNext": "Login with Email"
@@ -124,6 +131,13 @@
             "cancel": "Annulla",
             "loading": "Caricamento...",
             "welcome": "Benvenuto in YourMoney"
+        },
+        "errorDialog": {
+            "title": "Ops!",
+            "ok": "OK"
+        },
+        "errors": {
+            "Invalid login credentials": "Credenziali di accesso non valide"
         },
         "auth": {
             "initialStep": {
