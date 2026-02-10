@@ -468,6 +468,11 @@ export default function Index() {
     </TouchableOpacity>
   );
 
+  // Prepare greeting with translated text
+  const greeting = t('home.greeting');
+  const displayName = profile?.full_name || session?.user?.user_metadata?.full_name;
+  const [beforeName, afterName] = greeting.split('{name}');
+
   const renderDaySection = ({ item: day }) => {
     const date = new Date(Number(day.id));
 
@@ -508,7 +513,7 @@ export default function Index() {
 
       <View style={styles.containerHeader}>
         <Text style={styles.textHelloMessage}>
-          Hello, <Text style={{ fontWeight: "bold" }}>{profile?.full_name || session?.user?.user_metadata?.full_name}</Text>
+          {beforeName}<Text style={{ fontWeight: "bold" }}>{displayName}</Text>{afterName}
         </Text>
 
         <View style={styles.iconSearch}>
