@@ -1,19 +1,20 @@
-import { AntDesign, Entypo, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AntDesign, Entypo, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '../../constants/color';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../lib/i18n';
 import { supabase } from '../../lib/supabase';
+import txnStyles from '../../styles/components/transactionModal.styles';
 import ChangePasswordForm from '../components/ChangePasswordForm';
 
-const Avatar = ({ uri }: { uri?: string }) => (
-  <View style={styles.avatarWrap}>
+const Avatar = ({ uri, width = 56, height = 56 }: { uri?: string; width?: number; height?: number }) => (
+  <View style={[styles.avatarWrap, { width, height, borderRadius: width / 2, overflow: 'hidden' }]}>
     <Image
       source={{ uri: 'https://picsum.photos/100' }}
-      style={styles.avatar}
+      style={{ width: '100%', height: '100%' }}
     />
   </View>
 )
@@ -105,7 +106,7 @@ export default function AboutScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.headerCard}>
           <View style={styles.headerLeft}>
-            <Avatar uri={avatarUri} />
+            <Avatar uri={avatarUri} width={56} height={56} />
             <View style={{ marginLeft: 12 }}>
               <Text style={styles.name}>{displayName}</Text>
               <Text style={styles.email}>{displayEmail}</Text>
@@ -126,25 +127,34 @@ export default function AboutScreen() {
           <View style={styles.modalOverlay}>
             <Pressable style={styles.overlayFill} onPress={() => setAccountModalVisible(false)} />
             <View style={styles.bottomSheet}>
-              <Text style={styles.sheetTitle}>{t ? t('about.accountInformation') : 'Account Information'}</Text>
-
-              <View style={styles.headerCard}>
-                <View style={styles.headerLeft}>
-                  <Avatar uri={avatarUri} />
-                  <View style={{ marginLeft: 12 }}>
-                    <Text style={styles.name}>{displayName}</Text>
-                    <Text style={styles.email}>{displayEmail}</Text>
-                  </View>
+              <View style={txnStyles.topRow}>
+                <Text style={txnStyles.sheetTitle}>{t ? t('about.accountInformation') : 'Account Information'}</Text>
+                <View style={txnStyles.iconClose}>
+                  <TouchableOpacity onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light) } catch (e) { }; setAccountModalVisible(false) }}>
+                    <Ionicons name="close" size={20} color="#333" />
+                  </TouchableOpacity>
                 </View>
+              </View>
+
+              <View style={styles.headerLeftModal}>
+                <Avatar uri={avatarUri} width={150} height={150} />
               </View>
 
               <View style={styles.whiteCard}>
                 <View style={styles.row}>
-                  <Text style={styles.rowLabel}>Phone</Text>
+                  <Text style={styles.rowLabel}>Username</Text>
+                  <Text style={styles.chev}>{displayName}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Email</Text>
+                  <Text style={styles.chev}>{displayEmail}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Telefono</Text>
                   <Text style={styles.chev}>{profile?.phone ?? '-'}</Text>
                 </View>
                 <View style={styles.row}>
-                  <Text style={styles.rowLabel}>Country</Text>
+                  <Text style={styles.rowLabel}>Paese</Text>
                   <Text style={styles.chev}>{profile?.country ?? 'Italy'}</Text>
                 </View>
               </View>
@@ -180,7 +190,14 @@ export default function AboutScreen() {
           <View style={styles.modalOverlay}>
             <Pressable style={styles.overlayFill} onPress={() => setDevicesVisible(false)} />
             <View style={styles.bottomSheet}>
-              <Text style={styles.sheetTitle}>Dispositivi connessi</Text>
+              <View style={txnStyles.topRow}>
+                <Text style={txnStyles.sheetTitle}>Dispositivi connessi</Text>
+                <View style={txnStyles.iconClose}>
+                  <TouchableOpacity onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light) } catch (e) { }; setDevicesVisible(false) }}>
+                    <Ionicons name="close" size={20} color="#333" />
+                  </TouchableOpacity>
+                </View>
+              </View>
               <View style={styles.whiteCard}>
                 <View style={styles.row}>
                   <View style={styles.rowLeft}>
@@ -221,7 +238,14 @@ export default function AboutScreen() {
           <View style={styles.modalOverlay}>
             <Pressable style={styles.overlayFill} onPress={() => setChangePwdModalVisible(false)} />
             <View style={styles.bottomSheet}>
-              <Text style={styles.sheetTitle}>{t ? t('changePassword.title') : 'Change Password'}</Text>
+              <View style={txnStyles.topRow}>
+                <Text style={txnStyles.sheetTitle}>{t ? t('changePassword.title') : 'Change Password'}</Text>
+                <View style={txnStyles.iconClose}>
+                  <TouchableOpacity onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light) } catch (e) { }; setChangePwdModalVisible(false) }}>
+                    <Ionicons name="close" size={20} color="#333" />
+                  </TouchableOpacity>
+                </View>
+              </View>
               <ChangePasswordForm onDone={() => setChangePwdModalVisible(false)} />
             </View>
           </View>
@@ -278,7 +302,14 @@ export default function AboutScreen() {
           <View style={styles.modalOverlay}>
             <Pressable style={styles.overlayFill} onPress={() => setSettingsVisible(false)} />
             <View style={styles.bottomSheet}>
-              <Text style={styles.sheetTitle}>Imposta lingua</Text>
+              <View style={txnStyles.topRow}>
+                <Text style={txnStyles.sheetTitle}>Imposta lingua</Text>
+                <View style={txnStyles.iconClose}>
+                  <TouchableOpacity onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light) } catch (e) { }; setSettingsVisible(false) }}>
+                    <Ionicons name="close" size={20} color="#333" />
+                  </TouchableOpacity>
+                </View>
+              </View>
               <RowItem
                 icon={<Entypo name="language" size={24} color="black" />}
                 label={t ? t('settings.language') : 'Language'}
@@ -348,6 +379,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   headerLeft: { flexDirection: 'row', alignItems: 'center' },
+  headerLeftModal: {  alignItems: 'center' },
   avatarWrap: { width: 56, height: 56, borderRadius: 28, overflow: 'hidden' },
   avatar: { width: '100%', height: '100%' },
   name: { fontSize: 16, fontWeight: '600', color: '#111' },
@@ -428,4 +460,7 @@ const styles = StyleSheet.create({
   langRight: { flexDirection: 'row', alignItems: 'center' },
   langText: { marginRight: 8, color: '#333', fontWeight: '600' },
   langHint: { color: '#6b6b6b', fontSize: 12, marginTop: 10 },
+  sheetHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  closeBtn: { padding: 8, borderRadius: 8 },
+  closeX: { fontSize: 20, color: '#111', fontWeight: '700' },
 })
