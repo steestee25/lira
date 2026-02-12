@@ -1,8 +1,8 @@
 import { COLORS } from '@/constants/color'
+import { useTranslation } from '@/lib/i18n'
 import { MaterialIcons } from '@expo/vector-icons'
 import React, { useEffect, useRef } from 'react'
 import { Animated, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { useTranslation } from '@/lib/i18n'
 
 type Props = {
   visible: boolean

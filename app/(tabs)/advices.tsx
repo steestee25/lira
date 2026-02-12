@@ -247,19 +247,19 @@ export default function Advices() {
             console.log('advices: LLM disabled by toggle, using fallback advice')
             setFilteredAdvice([
               {
-                text: `Questo è un **costo significativo**. Potresti considerare di ridurre questo importo.\n\nConsigli: **pianifica un budget** per l'intrattenimento, sceglio attività gratuite (parchi, biblioteche, eventi gratuiti, ...).`,
+                text: `Questo è un **costo significativo**. Potresti considerare di ridurre questo importo.\nConsigli: **pianifica un budget** per l'intrattenimento, sceglio attività gratuite (parchi, biblioteche, eventi gratuiti, ...).`,
                 category: 'Svago'
               },
               {
-                text: `Questo è un costo **relativamente contenuto**.\n\nConsigli: prima di acquistare, verifica cosa hai già nel guardaroba e se l'acquisto è davvero necessario; privilegia capi versatili o di seconda mano per ridurre la spesa.`,
+                text: `Questo è un costo **relativamente contenuto**.\nConsigli: prima di acquistare, verifica cosa hai già nel guardaroba e se l'acquisto è davvero necessario; privilegia capi versatili o di seconda mano per ridurre la spesa.`,
                 category: 'Abbigliamento'
               },
               {
-                text: `Questo è un **costo importante**.\n\nConsigli: valuta alternative più economiche (bicicletta, percorsi alternativi) o verifica se l'abbonamento è davvero conveniente per il tuo utilizzo.`,
+                text: `Questo è un **costo importante**.\nConsigli: valuta alternative più economiche (bicicletta, percorsi alternativi) o verifica se l'abbonamento è davvero conveniente per il tuo utilizzo.`,
                 category: 'Trasporti'
               },
               {
-                text: `Questo è un **costo contenuto**.\n\nConsigli: analizza la spesa alimentare per **evitare sprechi** e **pianifica i pasti**.`,
+                text: `Questo è un **costo contenuto**.\nConsigli: analizza la spesa alimentare per **evitare sprechi** e **pianifica i pasti**.`,
                 category: 'Spesa'
               },
 

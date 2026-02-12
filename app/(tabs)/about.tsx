@@ -147,6 +147,7 @@ export default function AboutScreen() {
         visible={settingsVisible}
         animationType="slide"
         transparent
+        statusBarTranslucent={true}
         onRequestClose={() => setSettingsVisible(false)}
       >
         <View style={styles.modalOverlay}>

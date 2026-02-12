@@ -19,7 +19,8 @@ import {
 
 export default function Chat() {
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Ciao 👋, sono SaveBuddy. Come posso aiutarti?' }
+    { role: 'assistant', content: 'Ciao, sono Stella🌟, la tua assistente di finanza personale.' },
+    { role: 'assistant', content: 'Come posso aiutarti?' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,7 +38,7 @@ export default function Chat() {
   // Helper function to reset chat
   const resetChat = () => {
     setMessages([
-      { role: 'assistant', content: 'Ciao 👋, sono SaveBuddy. Come posso aiutarti?' }
+      { role: 'assistant', content: 'Ciao, sono Stella⭐, la tua assistente di finanza personale.' },
     ]);
     setInput('');
   };
