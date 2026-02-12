@@ -1,5 +1,6 @@
 import { Entypo, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { COLORS } from '../../constants/color';
@@ -43,6 +44,7 @@ function RowItem({ icon, label, onPress, right }: { icon?: React.ReactNode; labe
 
 export default function AboutScreen() {
   const { session } = useAuth()
+  const router = useRouter()
   const [profile, setProfile] = useState<any>(null)
     const [settingsVisible, setSettingsVisible] = useState(false)
     const { locale, setLocale, t } = useTranslation()
@@ -115,6 +117,21 @@ export default function AboutScreen() {
         <RowItem
           icon={<MaterialCommunityIcons name="account" size={24} color={COLORS.temp} />}
           label={t ? t('about.accountInformation') : 'Account Information'}
+          onPress={async () => {
+              try {
+                console.log('About -> Account: haptic start')
+                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+              } catch (e) {
+                // ignore haptic errors
+              }
+
+              try {
+                console.log('About -> Account: navigating to account')
+                router.push('account')
+              } catch (err) {
+                console.log('Navigation error (About -> Account):', err)
+              }
+            }}
         />
         <RowItem
           icon={<MaterialCommunityIcons name="form-textbox-password" size={24} color={COLORS.temp} />}
