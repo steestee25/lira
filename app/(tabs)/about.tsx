@@ -1,4 +1,4 @@
-import { Entypo, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AntDesign, Entypo, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -7,6 +7,7 @@ import { COLORS } from '../../constants/color';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../lib/i18n';
 import { supabase } from '../../lib/supabase';
+import ChangePasswordForm from '../components/ChangePasswordForm';
 
 const Avatar = ({ uri }: { uri?: string }) => (
   <View style={styles.avatarWrap}>
@@ -45,10 +46,13 @@ function RowItem({ icon, label, onPress, right }: { icon?: React.ReactNode; labe
 export default function AboutScreen() {
   const { session } = useAuth()
   const router = useRouter()
+  const [accountModalVisible, setAccountModalVisible] = useState(false)
+  const [changePwdModalVisible, setChangePwdModalVisible] = useState(false)
   const [profile, setProfile] = useState<any>(null)
-    const [settingsVisible, setSettingsVisible] = useState(false)
-    const { locale, setLocale, t } = useTranslation()
-    const [isItalian, setIsItalian] = useState(locale === 'it')
+  const [settingsVisible, setSettingsVisible] = useState(false)
+  const [devicesVisible, setDevicesVisible] = useState(false)
+  const { locale, setLocale, t } = useTranslation()
+  const [isItalian, setIsItalian] = useState(locale === 'it')
 
   useEffect(() => {
     if (!session?.user?.id) return
@@ -99,82 +103,186 @@ export default function AboutScreen() {
         </View>
       </View>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-      <View style={styles.headerCard}>
-        <View style={styles.headerLeft}>
-          <Avatar uri={avatarUri} />
-          <View style={{ marginLeft: 12 }}>
-            <Text style={styles.name}>{displayName}</Text>
-            <Text style={styles.email}>{displayEmail}</Text>
+        <View style={styles.headerCard}>
+          <View style={styles.headerLeft}>
+            <Avatar uri={avatarUri} />
+            <View style={{ marginLeft: 12 }}>
+              <Text style={styles.name}>{displayName}</Text>
+              <Text style={styles.email}>{displayEmail}</Text>
+            </View>
           </View>
+          <Pressable style={styles.editBtn}>
+            <Text style={styles.editText}>{t ? t('about.edit') : 'Edit'}</Text>
+          </Pressable>
         </View>
-        <Pressable style={styles.editBtn}>
-          <Text style={styles.editText}>{t ? t('about.edit') : 'Edit'}</Text>
-        </Pressable>
-      </View>
 
-      <Text style={styles.sectionTitle}>{t ? t('about.accountSettings') : 'Account Settings'}</Text>
-      <View style={styles.whiteCard}>
-        <RowItem
-          icon={<MaterialCommunityIcons name="account" size={24} color={COLORS.temp} />}
-          label={t ? t('about.accountInformation') : 'Account Information'}
-          onPress={async () => {
-              try {
-                console.log('About -> Account: haptic start')
-                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-              } catch (e) {
-                // ignore haptic errors
-              }
+        <Modal
+          visible={accountModalVisible}
+          animationType="slide"
+          transparent
+          statusBarTranslucent={true}
+          onRequestClose={() => setAccountModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <Pressable style={styles.overlayFill} onPress={() => setAccountModalVisible(false)} />
+            <View style={styles.bottomSheet}>
+              <Text style={styles.sheetTitle}>{t ? t('about.accountInformation') : 'Account Information'}</Text>
 
-              try {
-                console.log('About -> Account: navigating to account')
-                router.push('account')
-              } catch (err) {
-                console.log('Navigation error (About -> Account):', err)
-              }
+              <View style={styles.headerCard}>
+                <View style={styles.headerLeft}>
+                  <Avatar uri={avatarUri} />
+                  <View style={{ marginLeft: 12 }}>
+                    <Text style={styles.name}>{displayName}</Text>
+                    <Text style={styles.email}>{displayEmail}</Text>
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.whiteCard}>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Phone</Text>
+                  <Text style={styles.chev}>{profile?.phone ?? '-'}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Country</Text>
+                  <Text style={styles.chev}>{profile?.country ?? 'Italy'}</Text>
+                </View>
+              </View>
+
+              <Pressable
+                onPress={async () => {
+                  try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium) } catch (e) { }
+                  console.log('Cancella account pressed (modal)')
+                }}
+                style={styles.redCard}
+                android_ripple={{ color: 'rgba(255,255,255,0.18)' }}
+              >
+                <View style={styles.row}>
+                  <View style={styles.rowLeft}>
+                    <View style={styles.iconPlaceholderWhite}>
+                      <MaterialCommunityIcons name="trash-can-outline" size={22} color={COLORS.white} />
+                    </View>
+                    <Text style={styles.rowLabelWhite}>Cancella account</Text>
+                  </View>
+                  <Text style={[styles.chev, { color: '#fff' }]}>›</Text>
+                </View>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+        <Modal
+          visible={devicesVisible}
+          animationType="slide"
+          transparent
+          statusBarTranslucent={true}
+          onRequestClose={() => setDevicesVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <Pressable style={styles.overlayFill} onPress={() => setDevicesVisible(false)} />
+            <View style={styles.bottomSheet}>
+              <Text style={styles.sheetTitle}>Dispositivi connessi</Text>
+              <View style={styles.whiteCard}>
+                <View style={styles.row}>
+                  <View style={styles.rowLeft}>
+                    <Feather name="smartphone" size={24} color="black" />
+                    <Text style={[styles.rowLabel, { marginLeft: 12 }]}>Pixel 6</Text>
+                  </View>
+                </View>
+              </View>
+              <Pressable
+                onPress={async () => {
+                  try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium) } catch (e) { }
+                  console.log('Cancella account pressed (modal)')
+                }}
+                style={styles.redCard}
+                android_ripple={{ color: 'rgba(255,255,255,0.18)' }}
+              >
+                <View style={styles.row}>
+                  <View style={styles.rowLeft}>
+                    <View style={styles.iconPlaceholderWhite}>
+                      <AntDesign name="disconnect" size={22} color={COLORS.white} />
+                    </View>
+                    <Text style={styles.rowLabelWhite}>Scollega tutti i dispositivi</Text>
+                  </View>
+                  <Text style={[styles.chev, { color: '#fff' }]}>›</Text>
+                </View>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          visible={changePwdModalVisible}
+          animationType="slide"
+          transparent
+          statusBarTranslucent={true}
+          onRequestClose={() => setChangePwdModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <Pressable style={styles.overlayFill} onPress={() => setChangePwdModalVisible(false)} />
+            <View style={styles.bottomSheet}>
+              <Text style={styles.sheetTitle}>{t ? t('changePassword.title') : 'Change Password'}</Text>
+              <ChangePasswordForm onDone={() => setChangePwdModalVisible(false)} />
+            </View>
+          </View>
+        </Modal>
+
+        <Text style={styles.sectionTitle}>{t ? t('about.accountSettings') : 'Account Settings'}</Text>
+        <View style={styles.whiteCard}>
+          <RowItem
+            icon={<MaterialCommunityIcons name="account" size={24} color={COLORS.temp} />}
+            label={t ? t('about.accountInformation') : 'Account Information'}
+            onPress={async () => {
+              try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium) } catch (e) { }
+              setAccountModalVisible(true)
             }}
-        />
-        <RowItem
-          icon={<MaterialCommunityIcons name="form-textbox-password" size={24} color={COLORS.temp} />}
-          label={t ? t('about.changePassword') : 'Change Password'}
-        />
-        <RowItem
-          icon={<MaterialCommunityIcons name="devices" size={24} color={COLORS.temp} />}
-          label={t ? t('about.device') : 'Device'}
-        />
-      </View>
+          />
+          <RowItem
+            icon={<MaterialCommunityIcons name="form-textbox-password" size={24} color={COLORS.temp} />}
+            label={t ? t('about.changePassword') : 'Change Password'}
+            onPress={async () => {
+              try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium) } catch (e) { }
+              setChangePwdModalVisible(true)
+            }}
+          />
+          <RowItem
+            icon={<MaterialCommunityIcons name="devices" size={24} color={COLORS.temp} />}
+            label={"Dispositivi connessi"}
+            onPress={async () => {
+              try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium) } catch (e) { }
+              setDevicesVisible(true)
+            }}
+          />
+        </View>
 
-      <Text style={[styles.sectionTitle, { marginTop: 20 }]}>{t ? t('settings.title') : 'Settings'}</Text>
-      <View style={styles.whiteCard}>
-        <RowItem
-          icon={<Feather name="settings" size={22} color="black" />}
-          label={t ? t('settings.title') : 'Settings'}
-          onPress={() => setSettingsVisible(true)}
-        />
-        <RowItem
-          icon={<MaterialCommunityIcons name="assistant" size={22} color={COLORS.temp} />}
-          label={t ? t('about.helpSupport') : 'Help & Support'}
-        />
-        <RowItem
-          icon={<MaterialCommunityIcons name="information-slab-symbol" size={36} color={COLORS.temp} />}
-          label={t ? t('about.aboutLabel') : 'About'}
-        />
-      </View>
-      
-      <Modal
-        visible={settingsVisible}
-        animationType="slide"
-        transparent
-        statusBarTranslucent={true}
-        onRequestClose={() => setSettingsVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <Pressable style={styles.overlayFill} onPress={() => setSettingsVisible(false)} />
-          <View style={styles.bottomSheet}>
-            <Text style={styles.sheetTitle}>{t ? t('settings.title') : 'Settings'}</Text>
-            <RowItem
-              icon={<Entypo name="language" size={24} color="black" />}
-              label={t ? t('settings.language') : 'Language'}
-              right={(
+        <Text style={[styles.sectionTitle, { marginTop: 20 }]}>{t ? t('settings.title') : 'Settings'}</Text>
+        <View style={styles.whiteCard}>
+          <RowItem
+            icon={<Feather name="settings" size={22} color="black" />}
+            label={t ? t('settings.title') : 'Settings'}
+            onPress={() => setSettingsVisible(true)}
+          />
+          <RowItem
+            icon={<MaterialCommunityIcons name="assistant" size={22} color={COLORS.temp} />}
+            label={t ? t('about.helpSupport') : 'Help & Support'}
+          />
+        </View>
+
+        <Modal
+          visible={settingsVisible}
+          animationType="slide"
+          transparent
+          statusBarTranslucent={true}
+          onRequestClose={() => setSettingsVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <Pressable style={styles.overlayFill} onPress={() => setSettingsVisible(false)} />
+            <View style={styles.bottomSheet}>
+              <Text style={styles.sheetTitle}>Imposta lingua</Text>
+              <RowItem
+                icon={<Entypo name="language" size={24} color="black" />}
+                label={t ? t('settings.language') : 'Language'}
+                right={(
                   <View style={styles.langRight}>
                     <Text style={styles.langText}>{isItalian ? 'Italiano' : 'English'}</Text>
                     <Switch
@@ -192,28 +300,28 @@ export default function AboutScreen() {
                       }}
                     />
                   </View>
-              )}
-            />
+                )}
+              />
               <Text style={styles.langHint}>{t ? t('settings.languageHint') : 'Switch app language between Italiano and English'}</Text>
-          </View>
-        </View>
-      </Modal>
-      
-      <Pressable
-        onPress={handleLogout}
-        style={styles.redCard}
-        android_ripple={{ color: 'rgba(255,255,255,0.18)' }}
-      >
-        <View style={styles.row}>
-          <View style={styles.rowLeft}>
-            <View style={styles.iconPlaceholder}>
-              <MaterialCommunityIcons name="logout" size={22} color={COLORS.white} />
             </View>
-            <Text style={[styles.rowLabel, { color: '#fff' }]}>{t ? t('about.logout') : 'Logout'}</Text>
           </View>
-          <Text style={[styles.chev, { color: '#fff' }]}>›</Text>
-        </View>
-      </Pressable>
+        </Modal>
+
+        <Pressable
+          onPress={handleLogout}
+          style={styles.redCard}
+          android_ripple={{ color: 'rgba(255,255,255,0.18)' }}
+        >
+          <View style={styles.row}>
+            <View style={styles.rowLeft}>
+              <View style={styles.iconPlaceholder}>
+                <MaterialCommunityIcons name="logout" size={22} color={COLORS.white} />
+              </View>
+              <Text style={[styles.rowLabel, { color: '#fff' }]}>{t ? t('about.logout') : 'Logout'}</Text>
+            </View>
+            <Text style={[styles.chev, { color: '#fff' }]}>›</Text>
+          </View>
+        </Pressable>
 
       </ScrollView>
     </View>
@@ -251,13 +359,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   editText: { color: COLORS.primaryLightOpacityFill, fontWeight: '600' },
-  sectionTitle: { color: COLORS.temp, fontSize:16, marginTop:'3%', marginBottom: 8, fontWeight: '500' },
+  sectionTitle: { color: COLORS.temp, fontSize: 16, marginTop: '3%', marginBottom: 8, fontWeight: '500' },
   whiteCard: {
     backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 15,
-    paddingTop:10,
-    paddingBottom:10,
+    paddingTop: 10,
+    paddingBottom: 10,
     marginBottom: 12,
     elevation: 2,
   },
@@ -286,7 +394,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   rowLabel: { fontSize: 15, color: COLORS.temp, fontWeight: '500' },
-  chev: { color: '#bdb3c8', fontSize: 20},
+  chev: { color: '#bdb3c8', fontSize: 15 },
+  iconPlaceholderWhite: {
+    width: 38,
+    height: 38,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#fff',
+    marginRight: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rowLabelWhite: { fontSize: 15, color: '#fff', fontWeight: '500' },
   modalOverlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' },
   overlayFill: { flex: 1 },
   bottomSheet: {
@@ -305,7 +424,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: 'rgba(0,0,0,0.4)'
   },
-  sheetTitle: { fontSize: 16, fontWeight: '700', color: '#111', marginTop: '2%', marginBottom: 8 },
+  sheetTitle: { fontSize: 22, fontWeight: '700', color: '#111', marginTop: '2%', marginBottom: 8 },
   langRight: { flexDirection: 'row', alignItems: 'center' },
   langText: { marginRight: 8, color: '#333', fontWeight: '600' },
   langHint: { color: '#6b6b6b', fontSize: 12, marginTop: 10 },

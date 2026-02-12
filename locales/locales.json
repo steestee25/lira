@@ -93,6 +93,19 @@
             "helpSupport": "Help & Support",
             "aboutLabel": "About"
         },
+        "changePassword": {
+            "title": "Change Password",
+            "newLabel": "New password",
+            "confirmLabel": "Confirm password",
+            "updating": "Updating...",
+            "updateButton": "Update password",
+            "errorFill": "Please enter new password and confirmation",
+            "errorMismatch": "Passwords do not match",
+            "errorTitle": "Error",
+            "errorGeneric": "Unable to update password",
+            "successTitle": "Success",
+            "successMessage": "Password updated"
+        },
         "celebration": {
             "congrats": "Congratulations!",
             "message": "You've completed the setup"
@@ -205,6 +218,19 @@
             "device": "Dispositivo",
             "helpSupport": "Guida e Supporto",
             "aboutLabel": "Informazioni"
+        },
+        "changePassword": {
+            "title": "Cambia password",
+            "newLabel": "Nuova password",
+            "confirmLabel": "Conferma password",
+            "updating": "Aggiornamento...",
+            "updateButton": "Aggiorna password",
+            "errorFill": "Inserisci la nuova password e la conferma",
+            "errorMismatch": "Le password non coincidono",
+            "errorTitle": "Errore",
+            "errorGeneric": "Impossibile aggiornare la password",
+            "successTitle": "Successo",
+            "successMessage": "Password aggiornata"
         },
         "transactionModal": {
             "addTitle": "Aggiungi transazione",
