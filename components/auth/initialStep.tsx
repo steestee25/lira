@@ -3,12 +3,14 @@ import React from 'react'
 import {
   ActivityIndicator,
   Image,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native'
 
+import LanguageSelector from '@/components/LanguageSelector'
 import { COLORS } from '@/constants/color'
 import { useTranslation } from '../../lib/i18n'
 
@@ -19,7 +21,8 @@ interface Props {
 }
 
 export default function InitialStep({ onNext, loading }: Props) {
-  const { t } = useTranslation()
+  const { t, setLocale, locale } = useTranslation()
+  
   const handlePress = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
     onNext()
@@ -27,6 +30,10 @@ export default function InitialStep({ onNext, loading }: Props) {
 
   return (
     <View style={{ width: '100%' }}>
+      <LanguageSelector 
+        selectedKey={locale}
+        onSelect={(lang) => setLocale(lang)}
+      />
       <View style={styles.logoView}>
         <Image
           source={require('../../assets/images/coin_logo_no_bg.png')}
@@ -37,7 +44,7 @@ export default function InitialStep({ onNext, loading }: Props) {
 
       <Image
         source={require('../../assets/images/main3.png')}
-        style={{ width: '105%', height: 450 }}
+        style={{ width: Platform.OS === 'web' ? '65%' : '105%', height: 450, alignSelf: 'center', marginTop: Platform.OS === 'web' ? '2%' : '0%' }}
         resizeMode="contain"
       />
 
@@ -69,7 +76,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'center',
     borderRadius: 20,
-    marginTop: '20%'
+    marginTop: Platform.OS === 'web' ? '3%' : '10%',
   },
   logo: {
     width: 100,
@@ -81,7 +88,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   mt20: {
-    marginTop: 10,
+    marginTop: Platform.OS === 'web' ? '5%' : '0%',
   },
   button: {
     backgroundColor: COLORS.primaryLight,

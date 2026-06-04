@@ -1,7 +1,7 @@
 // app/_layout.tsx
 import LoadingIndicator from '@/components/LoadingIndicator'
 import { Stack } from 'expo-router'
-import { AppState, StyleSheet } from 'react-native'
+import { AppState, Platform, StyleSheet, View } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import CelebrationScreen from '../components/CelebrationScreen'
 import { AuthProvider, useAuth } from '../contexts/AuthContext'
@@ -39,7 +39,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <I18nProvider>
         <AuthProvider>
-          <RootLayoutContent />
+          <View style={Platform.OS === 'web' ? styles.webContainer : styles.mobileContainer}>
+            <RootLayoutContent />
+          </View>
         </AuthProvider>
       </I18nProvider>
     </SafeAreaProvider>
@@ -47,6 +49,15 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
+  webContainer: {
+    flex: 1,
+    maxWidth: 768,
+    marginHorizontal: 'auto',
+    width: '100%',
+  } as any,
+  mobileContainer: {
+    flex: 1,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',

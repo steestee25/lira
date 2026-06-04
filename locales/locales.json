@@ -15,11 +15,15 @@
         },
         "common": {
             "next": "Next",
+            "finish": "Finish",
             "back": "Back",
             "save": "Save",
             "cancel": "Cancel",
             "loading": "Loading...",
             "welcome": "Welcome to YourMoney"
+        },
+        "language": {
+            "select": "Select Language"
         },
         "errorDialog": {
             "title": "Oops!",
@@ -50,7 +54,15 @@
         },
         "home":{
             "greeting": "Hello, {name}!",
-            "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+            "monthsLabel": "months",
+            "recentTransactions": "All transactions",
+            "allIncomes": "All incomes",
+            "expenses": "Expenses",
+            "incomes": "Incomes",
+            "total": "Total",
+            "last6Months": "6 months",
+            "seeAll": "See all"
         },
         "settings": {
             "title": "Settings",
@@ -91,7 +103,11 @@
             "changePassword": "Change Password",
             "device": "Device",
             "helpSupport": "Help & Support",
-            "aboutLabel": "About"
+            "aboutLabel": "About",
+            "phone": "Phone",
+            "country": "Country",
+            "deleteAccount": "Delete Account",
+            "setLanguage": "Set Language"
         },
         "changePassword": {
             "title": "Change Password",
@@ -123,6 +139,11 @@
             "date": "Date",
             "add": "Add",
             "dateLocale": "en-GB"
+        },
+        "search": {
+            "title": "Transactions",
+            "placeholder": "Search",
+            "noResults": "No transactions found"
         }
     },
     "it": {
@@ -141,11 +162,15 @@
         },
         "common": {
             "next": "Avanti",
+            "finish": "Termina",
             "back": "Indietro",
             "save": "Salva",
             "cancel": "Annulla",
             "loading": "Caricamento...",
             "welcome": "Benvenuto in YourMoney"
+        },
+        "language": {
+            "select": "Seleziona Lingua"
         },
         "errorDialog": {
             "title": "Ops!",
@@ -176,7 +201,15 @@
         },
         "home":{
             "greeting": "Ciao, {name}!",
-            "months": ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"]
+            "months": ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"],
+            "monthsLabel": "mesi",
+            "recentTransactions": "Tutte le transazioni",
+            "allIncomes": "Tutte le entrate",
+            "expenses": "Spese",
+            "incomes": "Entrate",
+            "total": "Totale",
+            "last6Months": "6 mesi",
+            "seeAll": "Vedi tutte"
         },
         "settings": {
             "title": "Impostazioni",
@@ -217,7 +250,11 @@
             "changePassword": "Cambia password",
             "device": "Dispositivo",
             "helpSupport": "Guida e Supporto",
-            "aboutLabel": "Informazioni"
+            "aboutLabel": "Informazioni",
+            "phone": "Telefono",
+            "country": "Paese",
+            "deleteAccount": "Elimina account",
+            "setLanguage": "Imposta lingua"
         },
         "changePassword": {
             "title": "Cambia password",
@@ -245,6 +282,11 @@
             "date": "Data",
             "add": "Aggiungi",
             "dateLocale": "it-IT"
+        },
+        "search": {
+            "title": "Transazioni",
+            "placeholder": "Cerca",
+            "noResults": "Nessuna transazione trovata"
         },
         "celebration": {
             "congrats": "Complimenti!",

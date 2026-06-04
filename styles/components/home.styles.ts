@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
-import { COLORS } from "../constants/color";
+import { Platform, StyleSheet } from 'react-native';
+import { COLORS } from "../../constants/color";
 
 export const styles = StyleSheet.create({
   container: {
@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   containerHeader: {
-    marginTop: '10%',
+    marginTop: '3%',
     marginLeft: '5%',
     flexDirection: 'row',
     justifyContent: 'space-between'
@@ -26,56 +26,94 @@ export const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: COLORS.borderWhite,
   },
-  recapContainer: {
-    flex: 0.4,
-    marginTop: '3%',
-    marginLeft: '5%',
-    marginRight: '5%',
+  chartLabelText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 12,
   },
-  recapCard: {
-    flex: 1,
-    backgroundColor: '#9CF1F0',
-    borderRadius: 35,
-    padding: 20,
+  chartCard: {
+    backgroundColor: '#E6FAF9',
+    borderRadius: 24,
+    padding: 18,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.05,
+    shadowRadius: 20,
+    elevation: 4,
+  },
+  chartHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+  },
+  chartSummaryLeft: {
+    flex: 1,
+  },
+  chartTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#132b29',
+  },
+  chartBadge: {
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
     elevation: 2,
   },
-  recapCardExpensesContainer: {
-    left: '5%',
-    marginBottom: '20%',
+  chartBadgeText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#03A7A3',
   },
-  selectedValueText: {
-    position: 'absolute',
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginTop: -5,
+  chartTotalPeriodText: {
+    fontSize: 14,
+    color: '#52615e',
+    marginBottom: 6,
+  },
+  chartTotalValueText: {
+    fontSize: 34,
+    fontWeight: '800',
+    color: '#132b29',
+    marginBottom: 18,
+  },
+  chartInner: {
+    //backgroundColor: 'rgba(255,255,255,0.55)',
+    borderRadius: 20,
+    marginLeft: Platform.OS === 'web' ? '-5.5%' : 0,
   },
   transactionsContainer: {
-    flex: 0.6,
-    marginTop: '5%',
+    flex: 0.9,
+    marginTop: Platform.OS === 'web' ? '3%' : '5%',
     paddingHorizontal: '5%',
-    marginBottom: '15%',
+    marginBottom: Platform.OS === 'web' ? '9%' : '15%',
   },
   daySection: {
-    marginBottom: 25,
+    marginBottom: 18,
   },
   dayHeader: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#5B5F5F',
-    marginBottom: 15,
+    fontWeight: '700',
+    color: '#2b3a45',
+    marginBottom: 12,
+  },
+  dayGroup: {
+    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+    borderRadius: 24,
+    padding: 15,
   },
   transactionItem: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 10,
-    elevation: 0.6,
+    borderRadius: 18,
+  },
+  transactionItemGrouped: {
+    marginBottom: '7%',
   },
   transactionLeft: {
     flexDirection: 'row',

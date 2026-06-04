@@ -1,4 +1,7 @@
+import locales from '../locales/locales.json';
 import { supabase } from './supabase';
+
+type LocaleKey = 'en' | 'it';
 
 // Tipo per una transazione dal DB
 export interface DBTransaction {
@@ -215,10 +218,10 @@ export const groupTransactionsByDay = (
 };
 
 /**
- * Calcola le spese aggregate per mese degli ultimi 6 mesi
+ * Calcola le spese aggregate per mese degli ultimi 5 mesi
  * Restituisce array ordinato da più vecchio a più recente
  */
-export const fetchExpensesByMonth = async (userId: string) => {
+export const fetchExpensesByMonth = async (userId: string, locale: LocaleKey = 'en', numberOfMonths: number = 5) => {
   try {
     const { data, error } = await supabase
       .from('transactions')
@@ -232,11 +235,11 @@ export const fetchExpensesByMonth = async (userId: string) => {
     }
 
     console.log('✓ Fetched expenses data:', data);
-    // Calcola ultimi 6 mesi
+    // Calcola ultimi N mesi
     const monthsData: Record<string, number> = {};
     const today = new Date();
     
-    for (let i = 5; i >= 0; i--) {
+    for (let i = numberOfMonths - 1; i >= 0; i--) {
       const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       monthsData[monthKey] = 0;
@@ -253,13 +256,14 @@ export const fetchExpensesByMonth = async (userId: string) => {
     });
 
     // Converti in array con label mese
-    const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthLabels = ((locales as any)[locale]?.home?.months as string[]) || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return Object.entries(monthsData).map(([monthKey, total]) => {
       const [year, month] = monthKey.split('-');
       const monthIndex = parseInt(month) - 1;
       return {
         value: Math.round(total),
         label: monthLabels[monthIndex],
+        monthIndex,
       };
     });
   } catch (err) {
@@ -269,10 +273,10 @@ export const fetchExpensesByMonth = async (userId: string) => {
 };
 
 /**
- * Calcola gli income aggregati per mese degli ultimi 6 mesi
+ * Calcola gli income aggregati per mese degli ultimi 5 mesi
  * Restituisce array ordinato da più vecchio a più recente
  */
-export const fetchIncomeByMonth = async (userId: string) => {
+export const fetchIncomeByMonth = async (userId: string, locale: LocaleKey = 'en', numberOfMonths: number = 5) => {
   try {
     const { data, error } = await supabase
       .from('transactions')
@@ -286,11 +290,11 @@ export const fetchIncomeByMonth = async (userId: string) => {
     }
 
     console.log('✓ Fetched income data:', data);
-    // Calcola ultimi 6 mesi
+    // Calcola ultimi N mesi
     const monthsData: Record<string, number> = {};
     const today = new Date();
     
-    for (let i = 5; i >= 0; i--) {
+    for (let i = numberOfMonths - 1; i >= 0; i--) {
       const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       monthsData[monthKey] = 0;
@@ -307,13 +311,14 @@ export const fetchIncomeByMonth = async (userId: string) => {
     });
 
     // Converti in array con label mese
-    const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthLabels = ((locales as any)[locale]?.home?.months as string[]) || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return Object.entries(monthsData).map(([monthKey, total]) => {
       const [year, month] = monthKey.split('-');
       const monthIndex = parseInt(month) - 1;
       return {
         value: Math.round(total),
         label: monthLabels[monthIndex],
+        monthIndex,
       };
     });
   } catch (err) {
@@ -407,15 +412,14 @@ export const fetchExpensesByCategoryLast3Months = async (userId: string) => {
 export const fetchExpensesByCategoryLastYear = async (userId: string) => {
   try {
     const today = new Date();
-    const startOfThisYear = new Date(today.getFullYear(), 0, 1);
-    const startOfLastYear = new Date(today.getFullYear() - 1, 0, 1);
+    const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
 
     const { data, error } = await supabase
       .from('transactions')
       .select('category, amount')
       .eq('user_id', userId)
-      .gte('date', startOfLastYear.toISOString())
-      .lt('date', startOfThisYear.toISOString())
+      .gte('date', oneYearAgo.toISOString())
+      .lt('date', today.toISOString())
       .lt('amount', 0);
 
     if (error) {

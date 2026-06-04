@@ -1,16 +1,21 @@
 import { Session } from '@supabase/supabase-js'
 import { createContext, useContext, useEffect, useState } from 'react'
+import { clearQuestionnaireDraft, loadOnboardingStep, loadProficiencyLevel, loadQuestionnaireDraft, saveProficiencyLevel } from '../lib/questionnaireStorage'
 import { supabase } from '../lib/supabase'
+
+type AuthStep = 'initial' | 'email' | 'password' | 'name' | 'questionnaire'
 
 type AuthContextType = {
   session: Session | null
   loading: boolean
   isOnboarding: boolean
   isCelebrating: boolean
+  authStep: AuthStep
   beginOnboarding: () => void
   finishOnboarding: () => void
   startCelebration: () => void
   endCelebration: () => void
+  setAuthStep: (step: AuthStep) => void
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,10 +23,12 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   isOnboarding: false,
   isCelebrating: false,
+  authStep: 'initial',
   beginOnboarding: () => {},
   finishOnboarding: () => {},
   startCelebration: () => {},
   endCelebration: () => {},
+  setAuthStep: () => {},
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -29,21 +36,87 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [isOnboarding, setIsOnboarding] = useState(false)
   const [isCelebrating, setIsCelebrating] = useState(false)
+  const [authStep, setAuthStep] = useState<AuthStep>('initial')
 
   useEffect(() => {
-    // Enter the object → take "data" → inside "data" take "session"
-    // → create "session" variable
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setLoading(false)
-    })
+    const restoreProfileState = async (userId: string) => {
+      try {
+        const draft = await loadQuestionnaireDraft()
+        if (draft) {
+          setIsOnboarding(true)
+          setAuthStep('questionnaire')
+          return
+        }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const localStep = await loadOnboardingStep()
+        if (localStep) {
+          setIsOnboarding(true)
+          setAuthStep(localStep as any)
+          return
+        }
+
+        const localProficiency = await loadProficiencyLevel()
+        if (localProficiency) {
+          setIsOnboarding(false)
+          return
+        }
+
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('financial_score, proficiency_level')
+          .eq('id', userId)
+          .maybeSingle()
+
+        if (error) {
+          console.error('Errore nel controllo profilo:', error)
+          setIsOnboarding(true)
+          setAuthStep('questionnaire')
+          return
+        }
+
+        const hasCompleted = !!data && data.financial_score !== null && data.proficiency_level !== null
+
+        if (hasCompleted) {
+          setIsOnboarding(false)
+          await saveProficiencyLevel(data.proficiency_level)
+          await clearQuestionnaireDraft()
+        } else {
+          setIsOnboarding(true)
+          setAuthStep('questionnaire')
+        }
+      } catch (error) {
+        console.error('Errore nel controllo profilo:', error)
+        setIsOnboarding(true)
+        setAuthStep('questionnaire')
+      }
+    }
+
+    const initSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        setSession(session)
+
+        if (session) {
+          await restoreProfileState(session.user.id)
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    initSession()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session)
+
       if (!session) {
         setIsOnboarding(false)
         setIsCelebrating(false)
+        setAuthStep('initial')
+        return
       }
+
+      await restoreProfileState(session.user.id)
     })
 
     return () => subscription.unsubscribe()
@@ -58,13 +131,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         isOnboarding,
         isCelebrating,
+        authStep,
         beginOnboarding: () => setIsOnboarding(true),
-        finishOnboarding: () => setIsOnboarding(false),
-        startCelebration: () => {
-          setIsCelebrating(true)
+        finishOnboarding: () => {
           setIsOnboarding(false)
+          setAuthStep('initial')
         },
-        endCelebration: () => setIsCelebrating(false),
+        startCelebration: () => {
+          setIsOnboarding(false)
+          setAuthStep('initial')
+          setIsCelebrating(true)
+        },
+        endCelebration: () => {
+          setIsCelebrating(false)
+        },
+        setAuthStep,
       }}
     >
       {children}

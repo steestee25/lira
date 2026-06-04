@@ -1,22 +1,25 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from 'expo-haptics';
 import { useEffect, useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 
 import SyncStatus from "../../components/SyncStatus";
-import TransactionModal from "../../components/TransactionModal";
-import { styles } from "../../styles/home.styles";
+import { styles } from "../../styles/components/home.styles";
 
 import { useAuth } from '../../contexts/AuthContext';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { useTranslation } from '../../lib/i18n';
 import { supabase } from '../../lib/supabase';
 import { syncWithSupabase } from '../../lib/syncOffline';
-import { createTransaction, fetchExpensesByMonth, fetchIncomeByMonth, fetchUserTransactions, groupTransactionsByDay, updateTransaction } from '../../lib/transactions';
-import { createTransactionWithOfflineSupport, fetchUserTransactionsWithOfflineSupport, updateTransactionWithOfflineSupport } from '../../lib/transactionsOffline';
+import { createTransaction, deleteTransaction, fetchExpensesByMonth, fetchIncomeByMonth, fetchUserTransactions, groupTransactionsByDay, updateTransaction } from '../../lib/transactions';
+import { createTransactionWithOfflineSupport, deleteTransactionWithOfflineSupport, fetchUserTransactionsWithOfflineSupport, updateTransactionWithOfflineSupport } from '../../lib/transactionsOffline';
 import locales from '../../locales/locales.json';
 
+import ConfirmDialog from "@/components/ConfirmDialog";
+import SearchTransactionsScreen from "@/components/SearchTransactionsScreen";
+import TransactionModal from "@/components/TransactionModal";
+import TransactionItem from '../../components/TransactionItem';
 import { COLORS } from '../../constants/color';
 import { HORIZONTAL_GUTTER, RECAP_TOP } from '../../styles/spacing';
 
@@ -25,11 +28,16 @@ export default function Index() {
   const [selectedValue, setSelectedValue] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [searchScreenVisible, setSearchScreenVisible] = useState(false);
 
   // Form states (for update)
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [editingDayId, setEditingDayId] = useState(null);
+
+  // Confirm delete dialog state
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [transactionToDelete, setTransactionToDelete] = useState<any>(null);
 
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
   const [expenseData, setExpenseData] = useState([]);
@@ -44,6 +52,15 @@ export default function Index() {
   const [profile, setProfile] = useState<any>(null);
 
   const { locale, t } = useTranslation();
+
+  const { width } = useWindowDimensions();
+
+  // Determine number of months to show based on screen width
+  // Web desktop/tablet (width >= 768): 11 months
+  // Mobile/Web mobile emulation (width < 768): 5 months for phones (< 600), 11 months for tablets
+  const numberOfMonths = width >= 768 
+    ? 11 
+    : (width < 600 ? 5 : 11);
 
   // categories loaded from locales.json (icon, color, label)
   const categoriesFromLocale: Record<string, any> = (locales as any)[locale]?.categories || {};
@@ -120,12 +137,13 @@ export default function Index() {
 
         // Fetch dati del grafico in base a filterType
         const chartData = filterType === 'expenses'
-          ? await fetchExpensesByMonth(session.user.id)
-          : await fetchIncomeByMonth(session.user.id);
+          ? await fetchExpensesByMonth(session.user.id, locale, numberOfMonths)
+          : await fetchIncomeByMonth(session.user.id, locale, numberOfMonths);
 
         const chartDataWithColors = chartData.map((item, index) => ({
           ...item,
           frontColor: selectedIndex === index ? '#ffffff' : '#8fe8e7ff',
+          monthIndex: item.monthIndex ?? index,
         }));
         setChartData(chartDataWithColors);
       } catch (err) {
@@ -136,7 +154,7 @@ export default function Index() {
     };
 
     fetchTransactions();
-  }, [session?.user?.id, filterType]);
+  }, [session?.user?.id, filterType, numberOfMonths]);
 
   // Auto-sync when coming back online
   useEffect(() => {
@@ -174,12 +192,13 @@ export default function Index() {
     if (!userId) return;
     try {
       const chart = filterType === 'expenses'
-        ? await fetchExpensesByMonth(userId)
-        : await fetchIncomeByMonth(userId);
+        ? await fetchExpensesByMonth(userId, locale, numberOfMonths)
+        : await fetchIncomeByMonth(userId, locale, numberOfMonths);
 
       const chartDataWithColors = chart.map((item, index) => ({
         ...item,
         frontColor: selectedIndex === index ? '#ffffff' : (index % 2 === 0 ? '#8fe8e7ff' : '#78ebe9ff'),
+        monthIndex: item.monthIndex ?? index,
       }));
       setChartData(chartDataWithColors);
     } catch (err) {
@@ -192,7 +211,7 @@ export default function Index() {
     try {
       const monthsData = {} as Record<string, number>;
       const today = new Date();
-      for (let i = 5; i >= 0; i--) {
+      for (let i = 4; i >= 0; i--) {
         const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
         const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         monthsData[monthKey] = 0;
@@ -209,11 +228,11 @@ export default function Index() {
         }
       });
 
-      const monthLabels = t('home.months');
+      const monthLabels = ((locales as any)[locale]?.home?.months as string[]) || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const chart = Object.entries(monthsData).map(([monthKey, total]) => {
         const [year, month] = monthKey.split('-');
         const monthIndex = parseInt(month) - 1;
-        return { value: Math.round(total), label: monthLabels[monthIndex] }; 
+        return { value: Math.round(total), label: monthLabels[monthIndex], monthIndex };
       });
 
       const chartDataWithColors = chart.map((item, index) => ({
@@ -231,14 +250,25 @@ export default function Index() {
   console.log('Email:', session?.user?.email)
 
   // Prepare chart data with alternating colors
-  const data = chartData.length > 0 
+  const data = chartData.length > 0
     ? chartData.map((item, index) => ({
-        ...item,
-        frontColor: selectedIndex === index ? '#ffffff' : (index % 2 === 0 ? '#8fe8e7ff' : '#78ebe9ff'),
-      }))
+      ...item,
+      frontColor: selectedIndex === index ? '#ffffff' : (index % 2 === 0 ? '#8fe8e7ff' : '#78ebe9ff'),
+    }))
     : [
-        { value: 0, label: 'No Data', frontColor: '#8fe8e7ff' },
-      ];
+      { value: 0, label: 'No Data', frontColor: '#8fe8e7ff' },
+    ];
+
+  const selectedMonthItem = selectedIndex !== null && data[selectedIndex]
+    ? data[selectedIndex]
+    : data[data.length - 1];
+
+  const selectedMonthValue = selectedMonthItem?.value ?? 0;
+  const selectedMonthIndex = selectedMonthItem?.monthIndex ?? new Date().getMonth();
+  const selectedMonthFullLabel = new Date(new Date().getFullYear(), selectedMonthIndex, 1)
+    .toLocaleDateString(locale === 'it' ? 'it-IT' : 'en-GB', { month: 'long' });
+  const formattedMonthValue = `€${selectedMonthValue.toFixed(2)}`;
+  const totalPeriodText = `${t ? t('home.total') : 'Totale'} ${selectedMonthFullLabel?.charAt(0)?.toUpperCase() + selectedMonthFullLabel?.slice(1)}`;
 
   // Always sort days descending after updates
   const sortDaysDescending = (days) =>
@@ -419,8 +449,75 @@ export default function Index() {
     }
   };
 
+  // DELETE transaction
+  const handleDeleteTransaction = async (transaction) => {
+    if (!transaction?.id) {
+      console.error('Transaction ID not available');
+      return;
+    }
+
+    // Mostra il dialog di conferma
+    setTransactionToDelete(transaction);
+    setDeleteConfirmVisible(true);
+  };
+
+  // Callback quando l'utente conferma la cancellazione
+  const handleConfirmDelete = async () => {
+    if (!transactionToDelete?.id) {
+      return;
+    }
+
+    try {
+      // Cancella dal DB con supporto offline
+      const deleted = await deleteTransactionWithOfflineSupport(
+        transactionToDelete.id,
+        deleteTransaction
+      );
+
+      if (!deleted) {
+        console.error('Delete failed');
+        return;
+      }
+
+      // Rimuovi dalla lista locale
+      setExpenseData((prev) => {
+        let updatedDays = [...prev];
+        updatedDays = updatedDays.map((day) => ({
+          ...day,
+          transactions: day.transactions.filter((t) => t.id !== transactionToDelete.id),
+        })).filter((day) => day.transactions.length > 0);
+
+        return sortDaysDescending(updatedDays);
+      });
+
+      // Rimuovi da allTransactions
+      setAllTransactions((prev) =>
+        (prev || []).filter((t) => t.id !== transactionToDelete.id)
+      );
+
+      // Refresh chart
+      setSelectedValue(null);
+      setSelectedIndex(null);
+      if (isOnline) {
+        await refreshChart(session.user.id);
+      } else {
+        computeChartFromLocal(
+          (allTransactions || []).filter((t) => t.id !== transactionToDelete.id)
+        );
+      }
+
+      setEditModalVisible(false);
+      setSearchScreenVisible(false);
+    } catch (err) {
+      console.error('Errore nella cancellazione della transazione:', err);
+    } finally {
+      setDeleteConfirmVisible(false);
+      setTransactionToDelete(null);
+    }
+  };
+
   const handleBarPress = async (item, index) => {
-    try { await Haptics.selectionAsync(); } catch (e) {}
+    try { await Haptics.selectionAsync(); } catch (e) { }
     if (selectedIndex === index) {
       // Se la stessa barra è cliccata, deseleziona
       setSelectedValue(null);
@@ -432,41 +529,7 @@ export default function Index() {
     }
   };
 
-  const renderTransactionItem = ({ item: transaction, dayId }) => (
-    <TouchableOpacity
-      onPress={async () => {
-        try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch (e) {}
-        setEditingTransaction({ ...transaction, date: transaction.date || Number(dayId) });
-        setEditingDayId(dayId);
-        setEditModalVisible(true);
-      }}
-      activeOpacity={0.7}
-    >
-      <View style={styles.transactionItem}>
-        <View style={styles.transactionLeft}>
-          <View style={[styles.transactionIcon, { backgroundColor: transaction.color + '20' }]}>
-            <Text style={styles.transactionEmoji}>{transaction.icon}</Text>
-          </View>
-          <View>
-            <Text style={styles.transactionName}>{transaction.name}</Text>
-            <Text style={styles.transactionCategory}>
-              {transaction.amount > 0 
-                ? incomeCategoryLabels[transaction.category] || transaction.category
-                : categoryLabels[transaction.category] || transaction.category}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.transactionRight}>
-          <Text style={[
-            styles.transactionAmount,
-            transaction.amount > 0 && { color: COLORS.green}
-          ]}>
-            {transaction.amount > 0 ? '+' : '−'}€{Math.abs(transaction.amount).toFixed(2)}
-          </Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+
 
   // Prepare greeting with translated text
   const greeting = t('home.greeting');
@@ -483,7 +546,7 @@ export default function Index() {
       month: 'long',
       year: 'numeric',
     });
-    
+
     // Capitalize first letter of month for better formatting
     const capitalizedDate = formattedDate.replace(/(\s)([a-z])/g, (match, space, letter) => space + letter.toUpperCase());
 
@@ -499,11 +562,23 @@ export default function Index() {
     return (
       <View style={styles.daySection}>
         <Text style={styles.dayHeader}>{isToday ? todayLabel : capitalizedDate}</Text>
-        {day.transactions.map((transaction) => (
-          <View key={transaction.id}>
-            {renderTransactionItem({ item: transaction, dayId: day.id })}
-          </View>
-        ))}
+        <View style={styles.dayGroup}>
+          {day.transactions.map((transaction, index) => (
+            <View key={transaction.id}>
+              <TransactionItem
+                transaction={transaction}
+                isGrouped={day.transactions.length > 1 && index < day.transactions.length - 1}
+                onPress={() => {
+                  setEditingTransaction({ ...transaction, date: transaction.date || Number(day.id) });
+                  setEditingDayId(day.id);
+                  setEditModalVisible(true);
+                }}
+                categoryLabels={categoryLabels}
+                incomeCategoryLabels={incomeCategoryLabels}
+              />
+            </View>
+          ))}
+        </View>
       </View>
     );
   };
@@ -513,66 +588,103 @@ export default function Index() {
 
       <View style={styles.containerHeader}>
         <Text style={styles.textHelloMessage}>
-          {beforeName}<Text style={{ fontWeight: "bold" }}>{displayName}</Text>{afterName}
+          {beforeName}<Text style={{ fontWeight: "bold" }}>{displayName}</Text>{afterName}👋
         </Text>
 
-        <View style={styles.iconSearch}>
+        <TouchableOpacity
+          style={styles.iconSearch}
+          onPress={async () => {
+            try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch (e) { }
+            setSearchScreenVisible(true);
+          }}
+        >
           <Ionicons name="search-outline" size={26} color="#333" />
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Sync Status Indicator */}
       <SyncStatus isOnline={isOnline} isSyncing={isSyncing} />
 
       {/* Expenses/Income selector */}
-      <View style={{ flexDirection: 'row', marginTop: RECAP_TOP, marginHorizontal: HORIZONTAL_GUTTER, borderRadius: 35,
-        backgroundColor: '#faf9f9ff', padding: 4 }}>
+      <View style={{
+        flexDirection: 'row', marginTop: RECAP_TOP, marginHorizontal: HORIZONTAL_GUTTER, borderRadius: 35,
+        backgroundColor: '#f5f5f5', padding: 4
+      }}>
         <TouchableOpacity
-          onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch(e) {} ; setFilterType('expenses'); setSelectedValue(null); setSelectedIndex(null); }}
+          onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch (e) { }; setFilterType('expenses'); setSelectedValue(null); setSelectedIndex(null); }}
           style={{
             flex: 1,
-            paddingVertical: 8,
+            paddingVertical: 10,
             paddingHorizontal: 12,
-            borderRadius: 35,
+            borderRadius: 25,
             backgroundColor: filterType === 'expenses' ? '#ffffff' : 'transparent',
-            borderWidth: filterType === 'expenses' ? 0.5 : 0,
-            borderColor: filterType === 'expenses' ? '#e0e0e0f1' : 'transparent',
           }}
         >
-          <Text style={{ textAlign: 'center', 
-            fontWeight: filterType === 'expenses' ? '600' : '400', color: COLORS.red }}>
-            {t ? t('transactionModal.expense') : 'Expenses'}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            <Ionicons name="stats-chart" size={20} color={filterType === 'expenses' ? '#03A7A3' : '#999999'} />
+            <Text style={{
+              textAlign: 'center',
+              fontWeight: filterType === 'expenses' ? '600' : '500', 
+              color: filterType === 'expenses' ? '#03A7A3' : '#999999',
+              fontSize: 14,
+              marginTop: 2
+            }}>
+              {t ? t('transactionModal.expense') : 'Expenses'}
+            </Text>
+          </View>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch(e) {} ; setFilterType('income'); setSelectedValue(null); setSelectedIndex(null); }}
+          onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch (e) { }; setFilterType('income'); setSelectedValue(null); setSelectedIndex(null); }}
           style={{
             flex: 1,
-            paddingVertical: 8,
+            paddingVertical: 10,
             paddingHorizontal: 12,
-            borderRadius: 35,
+            borderRadius: 25,
             backgroundColor: filterType === 'income' ? '#ffffff' : 'transparent',
-            borderWidth: filterType === 'income' ? 0.5 : 0,
-            borderColor: filterType === 'income' ? '#e0e0e0f1' : 'transparent',
           }}
         >
-          <Text style={{ textAlign: 'center',
-            fontWeight: filterType === 'income' ? '600' : '400', color: COLORS.green }}>
-            {t ? t('transactionModal.income') : 'Income'}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            <Ionicons name="wallet" size={23} color={filterType === 'income' ? '#03A7A3' : '#999999'} />
+            <Text style={{
+              textAlign: 'center',
+              fontWeight: filterType === 'income' ? '600' : '500', 
+              color: filterType === 'income' ? '#03A7A3' : '#999999',
+              fontSize: 14,
+            }}>
+              {t ? t('transactionModal.income') : 'Income'}
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.recapContainer}>
-        <View style={styles.recapCard}>
-          <View style={styles.recapCardExpensesContainer}>
-            {(
-              <Text style={styles.selectedValueText}>
-                {selectedValue ? `${filterType === 'expenses' ? (t ? t('transactionModal.expense') : 'Expenses') : (t ? t('transactionModal.income') : 'Income')}: ${selectedValue}€` : (filterType === 'expenses' ? (t ? t('transactionModal.expense') : 'Expenses') : (t ? t('transactionModal.income') : 'Income'))}
-              </Text>)}
+      <View style={{ marginTop: RECAP_TOP, marginHorizontal: HORIZONTAL_GUTTER }}>
+        <View style={styles.chartCard}>
+          <View style={styles.chartHeaderRow}>
+            <View style={styles.chartSummaryLeft}>
+              <Text style={styles.chartTotalPeriodText}>{totalPeriodText}</Text>
+              <Text style={styles.chartTotalValueText}>{formattedMonthValue}</Text>
+            </View>
+            <View style={styles.chartBadge}>
+              <Text style={styles.chartBadgeText}>{numberOfMonths} {t ? t('home.monthsLabel') : 'months'}</Text>
+            </View>
           </View>
-          <BarChart data={data} barBorderRadius={8} yAxisThickness={0} xAxisThickness={0} hideRules={true}
-            hideYAxisText={true} noOfSections={1} height={125} xAxisLabelTextStyle={{ color: COLORS.white, fontWeight: 'bold' }} initialSpacing={10} onPress={handleBarPress} />
+
+          <View style={styles.chartInner}>
+            <BarChart
+              data={data}
+              barBorderRadius={20}
+              barWidth={38}
+              yAxisThickness={0}
+              xAxisThickness={0}
+              hideRules={true}
+              hideYAxisText={true}
+              noOfSections={1}
+              height={125}
+              xAxisLabelTextStyle={{ color: '#5b5f5f', fontWeight: '600', fontSize: 12 }}
+              frontColor={COLORS.primary}
+              onPress={handleBarPress}
+            />
+          </View>
         </View>
       </View>
 
@@ -609,6 +721,7 @@ export default function Index() {
           transaction={editingTransaction}
           onCancel={() => setEditModalVisible(false)}
           onSave={handleEditTransaction}
+          onDelete={handleDeleteTransaction}
           categoryIcons={categoryIcons}
           categoryColors={categoryColors}
           categoryLabels={categoryLabels}
@@ -618,6 +731,21 @@ export default function Index() {
         />
       </View>
 
+      {/* Search Transactions Screen */}
+      <SearchTransactionsScreen
+        visible={searchScreenVisible}
+        onClose={() => setSearchScreenVisible(false)}
+        transactions={allTransactions}
+        categoryLabels={categoryLabels}
+        incomeCategoryLabels={incomeCategoryLabels}
+        categoryIcons={categoryIcons}
+        categoryColors={categoryColors}
+        incomeCategoryIcons={incomeCategoryIcons}
+        incomeCategoryColors={incomeCategoryColors}
+        onSaveTransaction={handleEditTransaction}
+        onDeleteTransaction={handleDeleteTransaction}
+      />
+
       {/* FAB Button */}
       <View style={styles.fabContainer} pointerEvents="box-none">
         {/* FAB Assistente AI 
@@ -626,14 +754,30 @@ export default function Index() {
         </View>*/}
         {/* FAB Add */}
         <TouchableOpacity
-              style={styles.fabButton}
-              onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch(e) {}; setModalVisible(true); }}
-            >
+          style={styles.fabButton}
+          onPress={async () => { try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch (e) { }; setModalVisible(true); }}
+        >
           <Text>
             <Ionicons name="add" size={32} color={COLORS.white} />
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDialog
+        visible={deleteConfirmVisible}
+        title="Elimina transazione"
+        message="Sei sicuro di voler eliminare questa transazione?"
+        confirmText="Elimina"
+        cancelText="Annulla"
+        isDestructive={true}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          setDeleteConfirmVisible(false);
+          setTransactionToDelete(null);
+        }}
+      />
+
     </View>
   );
 }

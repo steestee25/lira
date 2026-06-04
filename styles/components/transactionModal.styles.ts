@@ -23,7 +23,8 @@ export default StyleSheet.create({
         borderWidth: 1,
         borderColor: "#ddd",
         borderRadius: 10,
-        padding: 10,
+        paddingVertical: 12,
+        paddingHorizontal: 12,
         marginBottom: 15,
     },
     label: {
@@ -44,6 +45,31 @@ export default StyleSheet.create({
         color: COLORS.white,
         fontWeight: "bold",
     },
+    categorySquare: {
+        width: 95,
+        height: 95,
+        borderWidth: 2,
+        borderColor: '#ddd',
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 10,
+        padding: 8,
+        backgroundColor: '#ffffff',
+    },
+    categorySquareEmoji: {
+        fontSize: 24,
+        marginBottom: 4,
+    },
+    categorySquareLabel: {
+        fontSize: 12,
+        fontWeight: '600',
+        textAlign: 'center',
+        color: '#333333',
+    },
+    categorySquareLabelSelected: {
+        color: '#333333',
+    },
     amountRow: {
         flexDirection: "row",
         alignItems: "center",
@@ -52,16 +78,29 @@ export default StyleSheet.create({
     amountLabel: {
         fontSize: 16,
         fontWeight: "600",
-        marginRight: 10,
-        width: 180,
+        marginRight: 0,
+        width: "100%",
     },
-    amountInput: {
-        flex: 1,
+    amountInputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         borderWidth: 1,
         borderColor: "#ddd",
         borderRadius: 10,
-        padding: 10,
-        textAlign: "center",
+        paddingHorizontal: 12,
+        backgroundColor: '#ffffff',
+    },
+    amountInputField: {
+        flex: 1,
+        paddingVertical: 12,
+        textAlign: "left",
+        fontSize: 16,
+    },
+    amountCurrency: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333333',
+        marginLeft: 8,
     },
     dateRow: {
         flexDirection: "row",
@@ -70,16 +109,20 @@ export default StyleSheet.create({
     },
     dateButton: {
         flex: 1,
-        backgroundColor: "#b3f0f0ff",
-       
+        backgroundColor: "#ffffff",
+        borderWidth: 1,
+        borderColor: "#ddd",
         paddingVertical: 10,
         paddingHorizontal: 15,
         borderRadius: 10,
         alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+        gap: 10,
     },
     dateButtonText: {
-        color: COLORS.white,
-        fontWeight: "bold",
+        color: "#333333",
+        fontWeight: "600",
         fontSize: 14,
     },
     actionRow: {

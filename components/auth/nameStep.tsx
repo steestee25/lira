@@ -4,6 +4,7 @@ import React, { useRef, useState } from 'react'
 import {
     Animated,
     Easing,
+    Platform,
     StyleSheet,
     Text,
     TextInput,
@@ -64,7 +65,10 @@ export default function NameStep({ name, setName, onNext }: Props) {
         outputRange: [110, -50], // move UP
     })
 
-    const titleOutputX = locale === 'en' ? -80 : -100
+    const isWeb = Platform.OS === 'web'
+    const titleOutputX = isWeb
+        ? (locale === 'en' ? -255 : -250)
+        : (locale === 'en' ? -80 : -100)
 
     const titleTranslateX = contentAnim.interpolate({
         inputRange: [0, 1],

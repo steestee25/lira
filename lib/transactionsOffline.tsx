@@ -188,9 +188,11 @@ export const deleteTransactionWithOfflineSupport = async (
       }
     } else {
       console.log('🔴 OFFLINE - Cancellazione transazione in cache locale...');
-      // Aggiungi a sync queue
+      // Cancella dalla cache locale SUBITO
+      await deleteTransactionOffline(transactionId);
+      // Aggiungi a sync queue per sincronizzare la cancellazione quando online
       await addToSyncQueue(transactionId, 'delete', {});
-      console.log('✓ Transazione marcata per cancellazione, sarà eliminata quando torni online');
+      console.log('✓ Transazione cancellata offline, sarà sincronizzata quando torni online');
       return true;
     }
   } catch (err) {

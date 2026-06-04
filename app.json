@@ -1,43 +1,28 @@
 {
   "expo": {
     "name": "YourMoney",
-    "slug": "YourMoney",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "com.yourmoney",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
+    "displayName": "YourMoney",
+    "scheme": "com.stefano10.yourmoney",
     "plugins": [
-      "expo-router",
       [
-        "expo-splash-screen",
+        "expo-build-properties",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "ios": {
+            "deploymentTarget": "15.1"
+          },
+          "android": {
+            "minSdkVersion": 26,
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35
+          }
         }
       ],
-      "expo-secure-store"
+      "expo-asset",
+      "expo-font"
     ],
-    "experiments": {
-      "typedRoutes": true
+    "android": {
+      "package": "com.stefano10.yourmoney",
+      "newArchEnabled": false
     }
   }
 }

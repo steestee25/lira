@@ -1,0 +1,37 @@
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+
+interface ProgressBarProps {
+  progress: number;
+}
+
+export default function ProgressBar({ progress }: ProgressBarProps): React.JSX.Element {
+  const clampedProgress = Math.max(0, Math.min(progress, 100));
+
+  return (
+    <View style={styles.container}>
+      <View style={[styles.bar, { width: `${clampedProgress}%` }]} />
+      <Text style={styles.text}>{clampedProgress}%</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    height: 20,
+    backgroundColor: "#444",
+    borderRadius: 10,
+    overflow: "hidden",
+    marginVertical: 10,
+  },
+  bar: {
+    height: "100%",
+    backgroundColor: "#2563EB",
+  },
+  text: {
+    position: "absolute",
+    alignSelf: "center",
+    color: "#fff",
+    fontSize: 12,
+  },
+});

@@ -1,13 +1,37 @@
-import { Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Octicons from '@expo/vector-icons/Octicons';
-import { Tabs, useRouter } from 'expo-router';
-import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Tabs, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Platform, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import ModelSelector from '../../components/ModelSelector';
 import { COLORS } from '../../constants/color';
+
+const CHAT_MODEL_OPTIONS = [
+  { key: 'call_gemma_1b', label: 'Gemma 1B' },
+  { key: 'call_gemma_270m', label: 'Gemma 270M' },
+  { key: 'call_smollm3', label: 'SmolLM3 3B' },
+];
 
 export default function TabLayout() {
     const router = useRouter();
+    const { model, rag } = useLocalSearchParams();
+    const ragParam = Array.isArray(rag) ? rag[0] : rag;
+    const { width } = useWindowDimensions();
+    const isSmartphoneWidth = width < 600;
+    // Default RAG to true on web, false on mobile
+    const defaultRagValue = Platform.OS === 'web' ? true : (ragParam !== '0');
+    const [isRagEnabled, setIsRagEnabled] = useState(defaultRagValue);
+
+    useEffect(() => {
+        // On web, default RAG to enabled if not specified
+        if (Platform.OS === 'web' && ragParam === undefined) {
+            setIsRagEnabled(true);
+            router.setParams({ rag: '1' });
+        } else {
+            setIsRagEnabled(ragParam !== '0');
+        }
+    }, [ragParam]);
 
     const handleNewMessage = () => {
         // Send event to reset messages in chat screen
@@ -16,7 +40,7 @@ export default function TabLayout() {
     };
 
     const HeaderButton = ({ onPress, children, style }: any) => (
-        <TouchableOpacity onPress={onPress} style={[styles.headerButton, style]}>{children}</TouchableOpacity>
+        <Pressable onPress={onPress} style={[styles.headerButton, style]}>{children}</Pressable>
     );
 
     return (
@@ -38,7 +62,7 @@ export default function TabLayout() {
                     shadowColor: '#000',
                 },
                 tabBarIconStyle: {
-                    marginTop: 12.5,
+                    marginTop: Platform.OS === 'web' && !isSmartphoneWidth ? 0 : 12.5,
                 },
 
             }}
@@ -61,20 +85,43 @@ export default function TabLayout() {
                     headerStyle: { backgroundColor: COLORS.white },
                     headerShown: true,
                     headerLeft: () => (
-                        <View style={{ marginLeft: 12 }}>
-                            <HeaderButton onPress={() => { /* open menu */ }}>
-                                <FontAwesome6 name="bars-staggered" size={20} color={COLORS.temp3} />
+                        <View style={{ marginLeft: 12, flexDirection: 'row', alignItems: 'center' }}>
+                            <HeaderButton onPress={() => router.push('/home')}>
+                                <MaterialIcons name="arrow-back" size={28} color={COLORS.black} />
                             </HeaderButton>
+                            <ModelSelector
+                                models={CHAT_MODEL_OPTIONS}
+                                selectedKey={typeof model === 'string' ? model : undefined}
+                                onSelect={(selected) => router.setParams({ model: selected })}
+                            />
+                            <Pressable
+                                onPress={() => {
+                                    const nextRag = !isRagEnabled;
+                                    setIsRagEnabled(nextRag);
+                                    router.setParams({
+                                        rag: nextRag ? '1' : '0',
+                                        model: typeof model === 'string' ? model : undefined,
+                                    });
+                                }}
+                                style={[styles.ragButton, !isRagEnabled && styles.ragButtonDisabled]}
+                                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                            >
+                                <MaterialCommunityIcons
+                                    name={isRagEnabled ? 'database' : 'database-off'}
+                                    size={18}
+                                    color={isRagEnabled ? COLORS.primary : '#94a3b8'}
+                                />
+                                <Text style={[styles.ragButtonText, !isRagEnabled && styles.ragButtonTextDisabled]}>
+                                    {isRagEnabled ? 'RAG On' : 'RAG Off'}
+                                </Text>
+                            </Pressable>
                         </View>
                     ),
                     headerRight: () => (
                         <View style={styles.headerRightContainer}>
                             <HeaderButton onPress={handleNewMessage}>
                                 <MaterialCommunityIcons name="shape-square-rounded-plus"
-                                    size={28} color={COLORS.temp3} />
-                            </HeaderButton>
-                            <HeaderButton style={{ marginLeft: 12 }} onPress={() => { /* more */ }}>
-                                <Entypo name="dots-three-vertical" size={20} color={COLORS.temp3} />
+                                    size={28} color={COLORS.black} />
                             </HeaderButton>
                         </View>
                     ),
@@ -124,5 +171,28 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginRight: 12,
+    },
+    ragButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: '9%',
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        borderRadius: 18,
+        backgroundColor: '#F8FAFC',
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+    },
+    ragButtonDisabled: {
+        backgroundColor: '#F1F5F9',
+    },
+    ragButtonText: {
+        marginLeft: 6,
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#0F172A',
+    },
+    ragButtonTextDisabled: {
+        color: '#94A3B8',
     },
 });

@@ -1,5 +1,5 @@
 // Shared spacing tokens for consistent layout across screens
-export const HEADER_TOP = '10%';
+export const HEADER_TOP = '4%';
 export const HORIZONTAL_GUTTER = '5%';
 export const RECAP_TOP = '3%';
 export const TRANSACTIONS_TOP = '5%';

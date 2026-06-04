@@ -1,5 +1,7 @@
 import { COLORS } from '@/constants/color'
 import { onboardingQuestions, Question } from '@/constants/questionnaire'
+import { useTranslation } from '@/lib/i18n'
+import { clearQuestionnaireDraft, loadQuestionnaireDraft, saveQuestionnaireDraft } from '@/lib/questionnaireStorage'
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Haptics from 'expo-haptics'
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
@@ -25,10 +27,43 @@ const QuestionnaireStep = forwardRef<QuestionnaireStepHandle, Props>(function Qu
   { onBack, onComplete },
   ref
 ) {
+  const { t } = useTranslation()
   const [questions, setQuestions] = useState<Question[]>(onboardingQuestions)
   const [index, setIndex] = useState(0)
 
   const contentAnim = useRef(new Animated.Value(0)).current
+
+  useEffect(() => {
+    const restoreDraft = async () => {
+      const draft = await loadQuestionnaireDraft()
+      if (!draft) {
+        await saveDraft(0, onboardingQuestions)
+        return
+      }
+
+      const restoredQuestions = onboardingQuestions.map((question) => ({
+        ...question,
+        answer: draft.answers[question.key] ?? question.answer ?? null,
+      }))
+
+      setQuestions(restoredQuestions)
+      setIndex(Math.min(draft.index, restoredQuestions.length - 1))
+    }
+
+    restoreDraft()
+  }, [])
+
+  const getAnswersPayload = (questionList: Question[]) => {
+    const payload: Record<string, string | string[] | null> = {}
+    questionList.forEach((question) => {
+      payload[question.key] = question.answer
+    })
+    return payload
+  }
+
+  const saveDraft = async (draftIndex: number, questionList: Question[]) => {
+    await saveQuestionnaireDraft({ answers: getAnswersPayload(questionList), index: draftIndex })
+  }
 
   const current = questions[index]
   const total = questions.length
@@ -67,6 +102,7 @@ const QuestionnaireStep = forwardRef<QuestionnaireStepHandle, Props>(function Qu
     }
 
     setQuestions(updated)
+    await saveDraft(index, updated)
   }
 
   const handleNext = async () => {
@@ -79,10 +115,12 @@ const QuestionnaireStep = forwardRef<QuestionnaireStepHandle, Props>(function Qu
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
 
     if (index < total - 1) {
-      setIndex(index + 1)
+      const nextIndex = index + 1
+      setIndex(nextIndex)
+      await saveDraft(nextIndex, questions)
     } else {
-      const payload: Record<string, string | string[] | null> = {}
-      questions.forEach((q) => (payload[q.key] = q.answer))
+      const payload = getAnswersPayload(questions)
+      await clearQuestionnaireDraft()
       onComplete(payload)
     }
   }
@@ -90,7 +128,10 @@ const QuestionnaireStep = forwardRef<QuestionnaireStepHandle, Props>(function Qu
   const handleBack = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
     if (index === 0) return onBack()
-    setIndex(index - 1)
+
+    const previousIndex = index - 1
+    setIndex(previousIndex)
+    await saveDraft(previousIndex, questions)
   }
 
   useImperativeHandle(ref, () => ({
@@ -174,7 +215,7 @@ const QuestionnaireStep = forwardRef<QuestionnaireStepHandle, Props>(function Qu
         onPress={handleNext}
       >
         <Text style={styles.nextText}>
-          {index === total - 1 ? 'Finish' : 'Next'}
+          {index === total - 1 ? t('common.finish') : t('common.next')}
         </Text>
       </TouchableOpacity>
     </View>
@@ -187,6 +228,8 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     flex: 1,
+    padding: 20,
+    marginTop: '2%',
   },
 
   backIcon: {

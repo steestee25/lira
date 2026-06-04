@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Animated,
   Easing,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -33,7 +34,7 @@ export default function PasswordStep({
   onSignUp,
   loading,
 }: Props) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const inputRef = useRef<TextInput>(null)
   const [showPassword, setShowPassword] = useState(false)
 
@@ -85,9 +86,14 @@ export default function PasswordStep({
     outputRange: [110, -50], // move UP
   })
 
+  const isWeb = Platform.OS === 'web'
+  const titleOutputX = isWeb
+    ? (locale === 'en' ? -260 : -250)
+    : (locale === 'en' ? -90 : -70)
+
   const titleTranslateX = contentAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -70], // move LEFT
+    outputRange: [0, titleOutputX], // move LEFT
   })
 
   const titleFontSize = contentAnim.interpolate({

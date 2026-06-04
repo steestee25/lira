@@ -5,6 +5,7 @@ import React, { useRef, useState } from 'react'
 import {
   Animated,
   Easing,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -73,11 +74,14 @@ export default function EmailStep({ email, setEmail, onNext, onBack }: Props) {
     outputRange: [110, -50], // move UP
   })
 
-  const titleOutputX = locale === 'en' ? -90 : -70
+  const isWeb = Platform.OS === 'web'
+  const titleOutputX = isWeb
+    ? (locale === 'en' ? -270 : -250)
+    : (locale === 'en' ? -90 : -70)
 
   const titleTranslateX = contentAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, titleOutputX], // move LEFT (lang-specific)
+    outputRange: [0, titleOutputX], // move LEFT (lang-specific, web variant)
   })
 
   const titleFontSize = contentAnim.interpolate({

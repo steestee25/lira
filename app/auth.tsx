@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { COLORS } from '@/constants/color'
+import { useRouter } from 'expo-router'
+import React, { useRef, useState } from 'react'
 import {
   BackHandler,
   KeyboardAvoidingView,
@@ -13,32 +15,33 @@ import PasswordStep from '../components/auth/passwordStep'
 import QuestionnaireStep, { QuestionnaireStepHandle } from '../components/auth/questionnaireStep'
 import ErrorDialog from '../components/ErrorDialog'
 import { useAuth } from '../contexts/AuthContext'
+import { computeFinancialScore } from '../lib/questionnaireScore'
+import { clearOnboardingStep, clearQuestionnaireDraft, saveOnboardingStep, saveProficiencyLevel } from '../lib/questionnaireStorage'
 import { supabase } from '../lib/supabase'
 
-type AuthStep = 'initial' | 'email' | 'password' | 'name' | 'questionnaire'
 type QuestionnaireAnswers = Record<string, string | string[] | null>
 
 export default function AuthScreen() {
-  const [step, setStep] = useState<AuthStep>('initial')
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
-  const [questionnaire, setQuestionnaire] = useState<QuestionnaireAnswers>({})
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  // Take from context the beginOnboarding and startCelebration functions
-  const { beginOnboarding, startCelebration } = useAuth()
+  const { authStep, setAuthStep, beginOnboarding, finishOnboarding, startCelebration } = useAuth()
   const questionnaireRef = useRef<QuestionnaireStepHandle>(null)
 
-  useEffect(() => {
+  const step = authStep
+
+  React.useEffect(() => {
     const handler = BackHandler.addEventListener('hardwareBackPress', () => {
       // return true to indicate we've handled the back button press (prevent default behavior)
       if (step === 'email') {
-        setStep('initial')
+        setAuthStep('initial')
         return true
       }
       if (step === 'password') {
-        setStep('email')
+        setAuthStep('email')
         return true
       }
       if (step === 'name') {
@@ -54,7 +57,7 @@ export default function AuthScreen() {
     })
     // Cleanup on unmount: when the component unmounts, remove the back handler
     return () => handler.remove()
-  }, [step]) // Dependency on step to update the handler when step changes
+  }, [step]) // Dependency only on step - setAuthStep doesn't need to be included
 
   const handleAuth = async (mode: 'signIn' | 'signUp') => {
     if (!email || !password) {
@@ -68,6 +71,10 @@ export default function AuthScreen() {
       mode === 'signIn'
         ? supabase.auth.signInWithPassword({ email, password })
         : supabase.auth.signUp({ email, password })
+
+    if (mode === 'signUp') {
+      beginOnboarding()
+    }
 
     const { error } = await action
 
@@ -85,8 +92,8 @@ export default function AuthScreen() {
 
     // Sign up succeeded, move forward in the onboarding flow
     setLoading(false)
-    beginOnboarding()
-    setStep('name')
+    await saveOnboardingStep('name')
+    setAuthStep('name')
   }
 
   const handleQuestionnaireComplete = async (answers: QuestionnaireAnswers) => {
@@ -99,17 +106,27 @@ export default function AuthScreen() {
       if (userError) throw userError
       if (!user) throw new Error('No authenticated user found')
 
-      const updates = {
+      const { totalScore, proficiencyLevel } = computeFinancialScore(answers)
+
+      const updates: Record<string, any> = {
         id: user.id,
-        full_name: name,
         questionnaire_answers: answers,
+        financial_score: totalScore,
+        proficiency_level: proficiencyLevel,
         updated_at: new Date(),
+      }
+
+      if (name) {
+        updates.full_name = name
       }
 
       const { error } = await supabase.from('profiles').upsert(updates)
       if (error) throw error
 
-      //setQuestionnaire(answers)
+      await saveProficiencyLevel(proficiencyLevel)
+      await clearQuestionnaireDraft()
+      await clearOnboardingStep()
+      finishOnboarding()
       startCelebration()
     } catch (error) {
       if (error instanceof Error) {
@@ -128,60 +145,75 @@ export default function AuthScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="always">
-        {step === 'initial' && (
-          <InitialStep onNext={() => setStep('email')} loading={loading} />
-        )}
-
-        {step === 'email' && (
-          <EmailStep
-            email={email}
-            setEmail={setEmail}
-            onNext={() => setStep('password')}
-            onBack={() => setStep('initial')}
-          />
-        )}
-
-        {step === 'password' && (
-          <PasswordStep
-            email={email}
-            password={password}
-            setPassword={setPassword}
-            loading={loading}
-            onBack={() => setStep('email')}
-            onSignIn={() => handleAuth('signIn')}
-            onSignUp={() => handleAuth('signUp')}
-          />
-        )}
-
-        {step === 'name' && (
-          <NameStep name={name} setName={setName} onNext={() => setStep('questionnaire')} />
-        )}
-
-        {step === 'questionnaire' && (
-          <QuestionnaireStep
-            ref={questionnaireRef}
-            onBack={() => setStep('name')}
-            onComplete={handleQuestionnaireComplete}
-          />
-        )}
-
-        <ErrorDialog
-          visible={!!errorMessage} // Show dialog if errorMessage is not null
-          message={errorMessage ?? ''}
-          onClose={() => setErrorMessage(null)}
+      {step === 'questionnaire' ? (
+        <QuestionnaireStep
+          ref={questionnaireRef}
+          onBack={() => setAuthStep('name')}
+          onComplete={handleQuestionnaireComplete}
         />
+      ) : (
+        <ScrollView 
+          contentContainerStyle={[
+            styles.scrollContent,
+            (step === 'name' || step === 'email' || step === 'password') && styles.scrollContentCompact
+          ]} 
+          keyboardShouldPersistTaps="always"
+        >
+          {step === 'initial' && (
+            <InitialStep onNext={() => setAuthStep('email')} loading={loading} />
+          )}
 
-      </ScrollView>
+          {step === 'email' && (
+            <EmailStep
+              email={email}
+              setEmail={setEmail}
+              onNext={() => setAuthStep('password')}
+              onBack={() => setAuthStep('initial')}
+            />
+          )}
+
+          {step === 'password' && (
+            <PasswordStep
+              email={email}
+              password={password}
+              setPassword={setPassword}
+              loading={loading}
+              onBack={() => setAuthStep('email')}
+              onSignIn={() => handleAuth('signIn')}
+              onSignUp={() => handleAuth('signUp')}
+            />
+          )}
+
+          {step === 'name' && (
+            <NameStep
+              name={name}
+              setName={setName}
+              onNext={async () => {
+                setAuthStep('questionnaire')
+                await saveOnboardingStep('questionnaire')
+              }}
+            />
+          )}
+
+          <ErrorDialog
+            visible={!!errorMessage}
+            message={errorMessage ?? ''}
+            onClose={() => setErrorMessage(null)}
+          />
+        </ScrollView>
+      )}
     </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: COLORS.white },
   scrollContent: {
     flexGrow: 1,
     padding: 20,
     marginTop: '8%',
+  },
+  scrollContentCompact: {
+    marginTop: '2%',
   },
 })
