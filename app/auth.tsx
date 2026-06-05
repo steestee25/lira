@@ -2,11 +2,11 @@ import { COLORS } from '@/constants/color'
 import { useRouter } from 'expo-router'
 import React, { useRef, useState } from 'react'
 import {
-  BackHandler,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet
+    BackHandler,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet
 } from 'react-native'
 import EmailStep from '../components/auth/emailStep'
 import InitialStep from '../components/auth/initialStep'
@@ -67,14 +67,18 @@ export default function AuthScreen() {
 
     setLoading(true)
 
+    // Per signUp, salva il step PRIMA dell'autenticazione per evitare race conditions
+    if (mode === 'signUp') {
+      await clearQuestionnaireDraft()
+      await clearOnboardingStep()
+      await saveOnboardingStep('name')  // Salva PRIMA del signUp
+      beginOnboarding()
+    }
+
     const action =
       mode === 'signIn'
         ? supabase.auth.signInWithPassword({ email, password })
         : supabase.auth.signUp({ email, password })
-
-    if (mode === 'signUp') {
-      beginOnboarding()
-    }
 
     const { error } = await action
 
@@ -90,9 +94,8 @@ export default function AuthScreen() {
       return
     }
 
-    // Sign up succeeded, move forward in the onboarding flow
+    // Sign up succeeded
     setLoading(false)
-    await saveOnboardingStep('name')
     setAuthStep('name')
   }
 

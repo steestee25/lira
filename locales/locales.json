@@ -8,7 +8,7 @@
             "chat": "Chat"
         },
         "advicesLabels": {
-            "lastMonth": "Last Month",
+            "lastMonth": "This Month",
             "threeMonths": "3 Months",
             "lastYear": "Last Year",
             "advices": "Advices"
@@ -126,6 +126,129 @@
             "congrats": "Congratulations!",
             "message": "You've completed the setup"
         },
+        "questionnaire": {
+            "context": {
+                "title": "Which situation describes you best?",
+                "options": {
+                    "student": "Student",
+                    "employee": "Employee",
+                    "freelancer": "Freelancer / Entrepreneur",
+                    "jobseeker": "Looking for work",
+                    "other": "Other"
+                }
+            },
+            "money_management": {
+                "title": "How do you currently manage your personal finances?",
+                "options": {
+                    "no_tracking": "I don't keep track of them",
+                    "informal_tracking": "I track spending informally (notes, memory)",
+                    "structured_tracking": "I use spreadsheets or budgeting apps",
+                    "active_planning": "I actively plan and review my finances"
+                }
+            },
+            "selfEval": {
+                "title": "How would you rate your personal finance knowledge?",
+                "options": {
+                    "very_low": "Very low",
+                    "low": "Low",
+                    "average": "Average",
+                    "good": "Good",
+                    "very_good": "Very good"
+                }
+            },
+            "reading": {
+                "title": "How often do you consume financial content (articles, videos, books)?",
+                "options": {
+                    "never": "Almost never",
+                    "sometimes": "Sometimes",
+                    "often": "Often"
+                }
+            },
+            "quiz1": {
+                "title": "If you take out a fixed-rate loan, what happens to the monthly payment if market interest rates rise?",
+                "options": {
+                    "increase": "It increases",
+                    "decrease": "It decreases",
+                    "same": "It stays the same",
+                    "unknown": "I don't know"
+                }
+            },
+            "quiz2": {
+                "title": "An ETF is:",
+                "options": {
+                    "deposit_account": "A bank deposit account",
+                    "etf_fund": "A listed fund that tracks an index",
+                    "credit_card": "A type of credit card",
+                    "unknown": "I don't know"
+                }
+            },
+            "quiz3": {
+                "title": "If you invest €1,000 at a 5% annual return, reinvesting interest each year, after 10 years you would have approximately:",
+                "options": {
+                    "1500": "€1,500",
+                    "1630": "€1,630",
+                    "2000": "€2,000",
+                    "unknown": "I don't know"
+                }
+            },
+            "quiz4": {
+                "title": "If inflation is consistently higher than your savings account interest rate, what is the main consequence over time?",
+                "options": {
+                    "lose_real_value": "Your money loses real value, even if the balance rises",
+                    "same_power": "Your purchasing power stays the same",
+                    "lose_only_if_down": "You only lose money if the balance drops",
+                    "unknown": "I don't know"
+                }
+            },
+            "quiz5": {
+                "title": "In which situation does diversification help the least?",
+                "options": {
+                    "high_correlation": "When assets are highly correlated",
+                    "long_term": "When investing for the long term",
+                    "small_amounts": "When investing small amounts regularly",
+                    "unknown": "I don't know"
+                }
+            },
+            "goal": {
+                "title": "What is your main financial goal right now?",
+                "options": {
+                    "basics": "Understand basic finance concepts",
+                    "budgeting": "Improve budgeting and save more",
+                    "investing": "Start investing",
+                    "specific": "Plan a specific goal (trip, home, etc.)",
+                    "other": "Other"
+                }
+            },
+            "income": {
+                "title": "Which range best describes your net monthly income?",
+                "options": {
+                    "lt_1000": "< €1,000",
+                    "1000_2000": "€1,000-2,000",
+                    "2000_3000": "€2,000-3,000",
+                    "gt_3000": "> €3,000",
+                    "no_answer": "I'd rather not say"
+                }
+            },
+            "saving": {
+                "title": "How much can you usually save each month (as % of net income)?",
+                "options": {
+                    "0_5": "0-5%",
+                    "5_15": "5-15%",
+                    "15_30": "15-30%",
+                    "gt_30": "> 30%",
+                    "dk": "I don't know exactly"
+                }
+            },
+            "risk": {
+                "title": "How comfortable are you with investment risk (value fluctuations)?",
+                "options": {
+                    "avoid_loss": "I want to avoid any loss",
+                    "small_risk": "I accept small fluctuations",
+                    "high_risk": "I accept large fluctuations for higher returns",
+                    "not_sure": "I'm not sure"
+                }
+            }
+        },
         "transactionModal": {
             "addTitle": "Add Transaction",
             "addIncomeTitle": "Add Income",
@@ -155,7 +278,7 @@
             "chat": "Chat"
         },
         "advicesLabels": {
-            "lastMonth": "Ultimo Mese",
+            "lastMonth": "Questo Mese",
             "threeMonths": "3 Mesi",
             "lastYear": "Ultimo Anno",
             "advices": "Consigli"
@@ -268,6 +391,129 @@
             "errorGeneric": "Impossibile aggiornare la password",
             "successTitle": "Successo",
             "successMessage": "Password aggiornata"
+        },
+        "questionnaire": {
+            "context": {
+                "title": "Quale situazione ti descrive meglio?",
+                "options": {
+                    "student": "Studente",
+                    "employee": "Dipendente",
+                    "freelancer": "Freelance / Imprenditore",
+                    "jobseeker": "In cerca di lavoro",
+                    "other": "Altro"
+                }
+            },
+            "money_management": {
+                "title": "Come gestisci attualmente le tue finanze personali?",
+                "options": {
+                    "no_tracking": "Non le tengo sotto controllo",
+                    "informal_tracking": "Traccio le spese in modo informale (note, memoria)",
+                    "structured_tracking": "Uso fogli di calcolo o app di budgeting",
+                    "active_planning": "Pianifico e rivedo attivamente le mie finanze"
+                }
+            },
+            "selfEval": {
+                "title": "Come valuteresti le tue conoscenze di finanza personale?",
+                "options": {
+                    "very_low": "Molto basse",
+                    "low": "Basse",
+                    "average": "Nella media",
+                    "good": "Buone",
+                    "very_good": "Molto buone"
+                }
+            },
+            "reading": {
+                "title": "Con quale frequenza consumi contenuti finanziari (articoli, video, libri)?",
+                "options": {
+                    "never": "Quasi mai",
+                    "sometimes": "A volte",
+                    "often": "Spesso"
+                }
+            },
+            "quiz1": {
+                "title": "Se stipuli un prestito a tasso fisso, cosa succede alla rata mensile se i tassi di interesse di mercato aumentano?",
+                "options": {
+                    "increase": "Aumenta",
+                    "decrease": "Diminuisce",
+                    "same": "Rimane uguale",
+                    "unknown": "Non lo so"
+                }
+            },
+            "quiz2": {
+                "title": "Un ETF è:",
+                "options": {
+                    "deposit_account": "Un conto di deposito bancario",
+                    "etf_fund": "Un fondo quotato in borsa che replica un indice",
+                    "credit_card": "Un tipo di carta di credito",
+                    "unknown": "Non lo so"
+                }
+            },
+            "quiz3": {
+                "title": "Se investi 1.000 € con un rendimento annuo del 5%, reinvestendo gli interessi ogni anno, dopo 10 anni avresti circa:",
+                "options": {
+                    "1500": "1.500 €",
+                    "1630": "1.630 €",
+                    "2000": "2.000 €",
+                    "unknown": "Non lo so"
+                }
+            },
+            "quiz4": {
+                "title": "Se l’inflazione è costantemente più alta del tasso di interesse del tuo conto di risparmio, qual è la principale conseguenza nel tempo?",
+                "options": {
+                    "lose_real_value": "Il tuo denaro perde valore reale, anche se il saldo aumenta",
+                    "same_power": "Il tuo denaro mantiene lo stesso potere d’acquisto",
+                    "lose_only_if_down": "Perdi denaro solo se il saldo diminuisce",
+                    "unknown": "Non lo so"
+                }
+            },
+            "quiz5": {
+                "title": "In quale situazione la diversificazione aiuta di meno?",
+                "options": {
+                    "high_correlation": "Quando gli asset sono fortemente correlati",
+                    "long_term": "Quando si investe nel lungo periodo",
+                    "small_amounts": "Quando si investono piccole somme regolarmente",
+                    "unknown": "Non lo so"
+                }
+            },
+            "goal": {
+                "title": "Qual è il tuo principale obiettivo finanziario in questo momento?",
+                "options": {
+                    "basics": "Capire i concetti base della finanza",
+                    "budgeting": "Migliorare il budgeting e risparmiare di più",
+                    "investing": "Iniziare a investire",
+                    "specific": "Pianificare un obiettivo specifico (viaggio, casa, ecc.)",
+                    "other": "Altro"
+                }
+            },
+            "income": {
+                "title": "Quale fascia descrive meglio il tuo reddito netto mensile?",
+                "options": {
+                    "lt_1000": "< 1.000 €",
+                    "1000_2000": "1.000-2.000 €",
+                    "2000_3000": "2.000-3.000 €",
+                    "gt_3000": "> 3.000 €",
+                    "no_answer": "Preferisco non rispondere"
+                }
+            },
+            "saving": {
+                "title": "Quanto riesci solitamente a risparmiare ogni mese (in % del reddito netto)?",
+                "options": {
+                    "0_5": "0-5%",
+                    "5_15": "5-15%",
+                    "15_30": "15-30%",
+                    "gt_30": "> 30%",
+                    "dk": "Non lo so con precisione"
+                }
+            },
+            "risk": {
+                "title": "Quanto ti senti a tuo agio con il rischio negli investimenti (fluttuazioni di valore)?",
+                "options": {
+                    "avoid_loss": "Voglio evitare qualsiasi perdita",
+                    "small_risk": "Accetto piccole fluttuazioni",
+                    "high_risk": "Accetto forti fluttuazioni per rendimenti più alti",
+                    "not_sure": "Non ne sono sicuro"
+                }
+            }
         },
         "transactionModal": {
             "addTitle": "Aggiungi transazione",

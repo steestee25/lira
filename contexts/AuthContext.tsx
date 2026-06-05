@@ -1,6 +1,6 @@
 import { Session } from '@supabase/supabase-js'
 import { createContext, useContext, useEffect, useState } from 'react'
-import { clearQuestionnaireDraft, loadOnboardingStep, loadProficiencyLevel, loadQuestionnaireDraft, saveProficiencyLevel } from '../lib/questionnaireStorage'
+import { clearOnboardingStep, clearProficiencyLevel, clearQuestionnaireDraft, loadOnboardingStep, loadProficiencyLevel, loadQuestionnaireDraft, saveProficiencyLevel } from '../lib/questionnaireStorage'
 import { supabase } from '../lib/supabase'
 
 type AuthStep = 'initial' | 'email' | 'password' | 'name' | 'questionnaire'
@@ -113,6 +113,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsOnboarding(false)
         setIsCelebrating(false)
         setAuthStep('initial')
+        // Pulisci TUTTI i dati di onboarding quando l'utente fa logout
+        await clearOnboardingStep()
+        await clearQuestionnaireDraft()
+        await clearProficiencyLevel()
         return
       }
 

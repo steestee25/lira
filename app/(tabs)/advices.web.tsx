@@ -1,16 +1,17 @@
 import { Feather } from '@expo/vector-icons'
 import React, { useEffect, useState } from 'react'
 import {
-    ActivityIndicator,
-    Linking,
-    Modal,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Linking,
+  Modal,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native'
+import { useIsFocused } from '@react-navigation/native'
 import { PieChart } from 'react-native-gifted-charts'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Source, SourcesDisplay } from '../../components/SourcesDisplay'
@@ -18,9 +19,9 @@ import { COLORS } from '../../constants/color'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTranslation } from '../../lib/i18n'
 import {
-    fetchExpensesByCategoryLast3Months,
-    fetchExpensesByCategoryLastMonth,
-    fetchExpensesByCategoryLastYear,
+  fetchExpensesByCategoryLast3Months,
+  fetchExpensesByCategoryLastMonth,
+  fetchExpensesByCategoryLastYear,
 } from '../../lib/transactions'
 import locales from '../../locales/locales.json'
 import { HEADER_TOP, HORIZONTAL_GUTTER } from '../../styles/spacing'
@@ -204,6 +205,7 @@ export default function Advices() {
   const { session, loading: authLoading } = useAuth()
   const { t, locale } = useTranslation()
   const insets = useSafeAreaInsets()
+  const isFocused = useIsFocused()
 
   const [period, setPeriod] = useState<PeriodType>('month')
   const [advices, setAdvices] = useState<Advice[]>([])
@@ -286,11 +288,11 @@ export default function Advices() {
   // ─── Data fetch + advice generation ────────────────────────────────────────
 
   useEffect(() => {
-    if (!authLoading && session?.user) {
+    if (isFocused && !authLoading && session?.user) {
       fetchAndGenerate()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, period, authLoading])
+  }, [session, period, authLoading, isFocused])
 
   const fetchAndGenerate = async () => {
     if (!session?.user) return
@@ -464,6 +466,26 @@ export default function Advices() {
     fetchAndGenerate()
   }
 
+  const formatDate = (d: Date) =>
+    d.toLocaleDateString(locale === 'it' ? 'it-IT' : 'en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    })
+
+  const getRangeText = () => {
+    if (period === 'month') return ''
+    const today = new Date()
+    const end = new Date(today.getTime())
+    const start = new Date(today.getTime())
+    if (period === '3months') {
+      start.setMonth(start.getMonth() - 3)
+    } else {
+      start.setFullYear(start.getFullYear() - 1)
+    }
+    return `${formatDate(start)} - ${formatDate(end)}`
+  }
+
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   if (authLoading) {
@@ -567,6 +589,15 @@ export default function Advices() {
         })}
       </View>
 
+      {/* Period range display (day-based for 3 months / year) */}
+      {period !== 'month' ? (
+        <View style={{ marginTop: '2%', alignItems: 'center', borderWidth: 0.5, 
+        borderColor: '#e0e0e0', backgroundColor: COLORS.white, alignSelf: 'center',
+        paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
+          <Text style={{ color: '#666', fontSize: 13, fontWeight: '450' }}>{getRangeText()}</Text>
+        </View>
+      ) : null}
+
       {/* Pie chart */}
       {pieData.length > 0 && (
         <View style={{ alignItems: 'center', paddingVertical: 20 }}>
@@ -584,7 +615,7 @@ export default function Advices() {
           />
           <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10, flexWrap: 'wrap' }}>
             {(selectedIndex !== null ? [pieData[selectedIndex]].filter(Boolean) : pieData).map((p) => (
-              <View key={p.label} style={{ flexDirection: 'row', alignItems: 'center', width: 150, marginRight: 12, marginBottom: 6 }}>
+              <View key={p.label} style={{ flexDirection: 'row', alignItems: 'center', width: 150, marginLeft: '5%', marginRight: 12, marginBottom: 6 }}>
                 <View style={{ height: 10, width: 10, borderRadius: 5, backgroundColor: p.color, marginRight: 10 }} />
                 <Text style={{ color: 'black', fontSize: 12 }}>
                   {p.label}: {Math.round((p.value / Math.max(1, pieData.reduce((s, x) => s + x.value, 0))) * 100)}%
@@ -598,7 +629,7 @@ export default function Advices() {
       {/* Advice list */}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        style={{ paddingHorizontal: HORIZONTAL_GUTTER, marginTop: 20 }}
+        style={{ paddingHorizontal: HORIZONTAL_GUTTER, marginTop: '2%', marginBottom: '5%' }}
         contentContainerStyle={{ paddingBottom: insets.bottom + 96 }}
         refreshControl={
           <RefreshControl

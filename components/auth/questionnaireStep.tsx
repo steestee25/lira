@@ -1,5 +1,5 @@
 import { COLORS } from '@/constants/color'
-import { onboardingQuestions, Question } from '@/constants/questionnaire'
+import { localizeQuestions, onboardingQuestions, Question } from '@/constants/questionnaire'
 import { useTranslation } from '@/lib/i18n'
 import { clearQuestionnaireDraft, loadQuestionnaireDraft, saveQuestionnaireDraft } from '@/lib/questionnaireStorage'
 import { MaterialIcons } from '@expo/vector-icons'
@@ -28,7 +28,7 @@ const QuestionnaireStep = forwardRef<QuestionnaireStepHandle, Props>(function Qu
   ref
 ) {
   const { t } = useTranslation()
-  const [questions, setQuestions] = useState<Question[]>(onboardingQuestions)
+  const [questions, setQuestions] = useState<Question[]>(() => localizeQuestions(onboardingQuestions, t))
   const [index, setIndex] = useState(0)
 
   const contentAnim = useRef(new Animated.Value(0)).current
@@ -36,12 +36,13 @@ const QuestionnaireStep = forwardRef<QuestionnaireStepHandle, Props>(function Qu
   useEffect(() => {
     const restoreDraft = async () => {
       const draft = await loadQuestionnaireDraft()
+      const localizedBase = localizeQuestions(onboardingQuestions, t)
       if (!draft) {
-        await saveDraft(0, onboardingQuestions)
+        await saveDraft(0, localizedBase)
         return
       }
 
-      const restoredQuestions = onboardingQuestions.map((question) => ({
+      const restoredQuestions = localizedBase.map((question) => ({
         ...question,
         answer: draft.answers[question.key] ?? question.answer ?? null,
       }))
@@ -52,6 +53,20 @@ const QuestionnaireStep = forwardRef<QuestionnaireStepHandle, Props>(function Qu
 
     restoreDraft()
   }, [])
+
+  useEffect(() => {
+    setQuestions((currentQuestions) => {
+      const answersByKey = currentQuestions.reduce(
+        (acc, question) => ({ ...acc, [question.key]: question.answer }),
+        {} as Record<string, string | string[] | null>,
+      )
+
+      return localizeQuestions(onboardingQuestions, t).map((question) => ({
+        ...question,
+        answer: answersByKey[question.key] ?? question.answer ?? null,
+      }))
+    })
+  }, [t])
 
   const getAnswersPayload = (questionList: Question[]) => {
     const payload: Record<string, string | string[] | null> = {}

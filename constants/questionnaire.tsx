@@ -14,6 +14,20 @@ export interface Question {
     correctAnswer?: string
 }
 
+export function localizeQuestions(
+    questions: Question[],
+    t: (path: string) => string,
+): Question[] {
+    return questions.map((question) => ({
+        ...question,
+        title: t(`questionnaire.${question.key}.title`),
+        options: question.options.map((option) => ({
+            ...option,
+            label: t(`questionnaire.${question.key}.options.${option.value}`),
+        })),
+    }))
+}
+
 export const onboardingQuestions: Question[] = [
     // ---------------- 2.1 CONTESTO ----------------
     {

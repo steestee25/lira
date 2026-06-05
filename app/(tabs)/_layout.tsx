@@ -92,7 +92,12 @@ export default function TabLayout() {
                             <ModelSelector
                                 models={CHAT_MODEL_OPTIONS}
                                 selectedKey={typeof model === 'string' ? model : undefined}
-                                onSelect={(selected) => router.setParams({ model: selected })}
+                                onSelect={(selected) => {
+                                    router.setParams({ 
+                                        model: selected,
+                                        resetMessages: Date.now().toString()
+                                    });
+                                }}
                             />
                             <Pressable
                                 onPress={() => {

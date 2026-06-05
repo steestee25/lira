@@ -328,23 +328,21 @@ export const fetchIncomeByMonth = async (userId: string, locale: LocaleKey = 'en
 };
 
 /**
- * Fetch total expenses for the previous calendar month grouped by category
+ * Fetch total expenses for the current calendar month grouped by category
  * Returns array of { category, total } ordered by total desc
  */
 export const fetchExpensesByCategoryLastMonth = async (userId: string) => {
   try {
     const today = new Date();
-    // Start of previous month
-    const startOfThisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-    const endOfLastMonth = new Date(startOfThisMonth.getTime());
+    const startOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
 
     const { data, error } = await supabase
       .from('transactions')
       .select('category, amount')
       .eq('user_id', userId)
-      .gte('date', startOfLastMonth.toISOString())
-      .lt('date', endOfLastMonth.toISOString())
+      .gte('date', startOfCurrentMonth.toISOString())
+      .lt('date', startOfNextMonth.toISOString())
       .lt('amount', 0);
 
     if (error) {
@@ -368,21 +366,23 @@ export const fetchExpensesByCategoryLastMonth = async (userId: string) => {
 };
 
 /**
- * Fetch total expenses for the last 3 months grouped by category
+ * Fetch total expenses for the last 3 full months including the current month grouped by category
  * Returns array of { category, total } ordered by total desc
  */
 export const fetchExpensesByCategoryLast3Months = async (userId: string) => {
   try {
+    // Range: from the same day 3 months ago up to now (inclusive)
     const today = new Date();
-    const startOfThisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const startOf3MonthsAgo = new Date(today.getFullYear(), today.getMonth() - 3, 1);
+    const end = new Date(today.getTime());
+    const start = new Date(today.getTime());
+    start.setMonth(start.getMonth() - 3);
 
     const { data, error } = await supabase
       .from('transactions')
       .select('category, amount')
       .eq('user_id', userId)
-      .gte('date', startOf3MonthsAgo.toISOString())
-      .lt('date', startOfThisMonth.toISOString())
+      .gte('date', start.toISOString())
+      .lte('date', end.toISOString())
       .lt('amount', 0);
 
     if (error) {
@@ -406,20 +406,23 @@ export const fetchExpensesByCategoryLast3Months = async (userId: string) => {
 };
 
 /**
- * Fetch total expenses for the last year grouped by category
+ * Fetch total expenses for the last 12 months including the current month grouped by category
  * Returns array of { category, total } ordered by total desc
  */
 export const fetchExpensesByCategoryLastYear = async (userId: string) => {
   try {
+    // Range: from the same day 12 months ago up to now (inclusive)
     const today = new Date();
-    const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+    const end = new Date(today.getTime());
+    const start = new Date(today.getTime());
+    start.setFullYear(start.getFullYear() - 1);
 
     const { data, error } = await supabase
       .from('transactions')
       .select('category, amount')
       .eq('user_id', userId)
-      .gte('date', oneYearAgo.toISOString())
-      .lt('date', today.toISOString())
+      .gte('date', start.toISOString())
+      .lte('date', end.toISOString())
       .lt('amount', 0);
 
     if (error) {
