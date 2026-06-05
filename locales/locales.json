@@ -11,7 +11,9 @@
             "lastMonth": "This Month",
             "threeMonths": "3 Months",
             "lastYear": "Last Year",
-            "advices": "Advices"
+            "advices": "Advices",
+            "modelLoading": "Loading model...",
+            "advicesGeneration": "Generating advices..."
         },
         "common": {
             "next": "Next",

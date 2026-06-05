@@ -532,7 +532,7 @@ export default function Chat(): React.JSX.Element {
         console.log('Final response text:', finalResponse);
         setConversation(prev => [
           ...prev,
-          { role: 'assistant', content: finalResponse, sources: retrievedDocsData },
+          { role: 'assistant', content: finalResponse, sources: retrievedDocsData.length > 0 ? retrievedDocsData : undefined },
         ]);
         setStreamingText('');
         setRagPhase('complete');
@@ -668,11 +668,10 @@ export default function Chat(): React.JSX.Element {
               onSendMessage={() => handleSendMessage()}
               isGenerating={isGenerating}
               streamingText={streamingText}
-              showSourcesButton={currentSources.length > 0}
               answerPhase={ragPhase}
               isFirstQuestion={conversation.length === 1}
-              onOpenSources={() => {
-                setSelectedSources(currentSources.map(source => ({ ...source })));
+              onOpenSources={(sources) => {
+                setSelectedSources(sources);
                 setSourcesSheetVisible(true);
               }}
             />
@@ -684,7 +683,6 @@ export default function Chat(): React.JSX.Element {
               statusBarTranslucent
               onRequestClose={() => {
                 setSourcesSheetVisible(false);
-                setSelectedSources([]);
               }}
             >
               <View style={appStyles.sheetOverlay}>
@@ -693,7 +691,6 @@ export default function Chat(): React.JSX.Element {
                   activeOpacity={1}
                   onPress={() => {
                     setSourcesSheetVisible(false);
-                    setSelectedSources([]);
                   }}
                 />
                 <View style={appStyles.sheetContainer}>
@@ -714,7 +711,6 @@ export default function Chat(): React.JSX.Element {
                               // ignore haptic failure
                             }
                             setSourcesSheetVisible(false);
-                            setSelectedSources([]);
                           }}
                         >
                           <Ionicons name="close" size={20} color="#333" />

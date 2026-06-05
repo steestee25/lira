@@ -150,7 +150,6 @@ export const appStyles = StyleSheet.create({
   },
   sheetContent: {
     flex: 1,
-    minHeight: 0,
   },
   webViewContainer: {
     flex: 1,

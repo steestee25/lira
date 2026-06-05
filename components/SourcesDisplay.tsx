@@ -81,10 +81,10 @@ export function SourcesDisplay({
   }
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim, flex: 1, minHeight: 0, maxHeight: '100%' }]}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <ScrollView
-        style={{ flex: 1, minHeight: 0 }}
-        contentContainerStyle={{ paddingBottom: 200, flexGrow: 1 }}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentInsetAdjustmentBehavior="always"

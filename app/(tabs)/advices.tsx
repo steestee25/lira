@@ -413,7 +413,7 @@ export default function Advices() {
       }
 
       console.log('[Model] calling initLlama…')
-      setStatusText('Caricamento modello…')
+      setStatusText((t ? t('advicesLabels.modelLoading') : 'Caricamento del modello'))
       contextRef.current = await initLlama({
         model: path,
         use_mlock: true,
@@ -596,7 +596,7 @@ export default function Advices() {
 
     isGeneratingRef.current = true
     console.log('[Inference] starting generation…')
-    setStatusText('Generazione consigli…')
+    setStatusText((t ? t('advicesLabels.advicesGeneration') : 'Generazione dei consigli...'))
     let fullResponse = ''
 
     try {

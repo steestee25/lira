@@ -30,7 +30,6 @@ type Props = {
   isGenerating: boolean;
   isLargeScreen?: boolean;
   streamingText?: string;
-  showSourcesButton?: boolean;
   onOpenSources?: (sources: any[]) => void;
   answerPhase?: AnimationPhase;
   isFirstQuestion?: boolean;
@@ -112,8 +111,11 @@ export default function ChatScreen({
                         <Feather name="copy" size={20} color="#000" />
                       </TouchableOpacity>
 
-                      {showSourcesButton && msg.sources?.length ? (
-                        <TouchableOpacity style={styles.sourcesButton} onPress={() => onOpenSources(msg.sources || [])}>
+                      {msg.sources?.length ? (
+                        <TouchableOpacity 
+                          style={styles.sourcesButton} 
+                          onPress={() => onOpenSources?.(msg.sources || [])}
+                        >
                           <Text style={styles.sourcesButtonText}>{t('chat.sources')}</Text>
                           <Feather name="chevron-down" size={16} color="#000" style={{ marginLeft: 8 }} />
                         </TouchableOpacity>
