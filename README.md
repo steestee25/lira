@@ -1,4 +1,6 @@
-# <img src="./assets/images/coin_logo_no_bg.png" alt="LIRA" width="80" height="80"  style="vertical-align: middle;">  LIRA - Personal Finance Chatbot for Italian Language LIRA 
+<img src="./assets/images/coin_logo_no_bg.png" alt="LIRA" width="80" height="80">  
+# LIRA - Personal Finance Chatbot for Italian Language LIRA 
+
 A cross-platform personal finance assistant combining on-device Small Language Models (SLMs), Retrieval-Augmented Generation (RAG), and personalized financial analytics. LIRA supports users in understanding personal finance concepts through natural language interaction, personalized financial profiling, transaction tracking, and spending analysis.
 
 ## 🎥 Demo Video
@@ -7,7 +9,12 @@ A cross-platform personal finance assistant combining on-device Small Language M
 
 ## 🌐 Live Application
 
-[Try the app to discover all features!](https://lira--p7yl6268qj.expo.app)
+[Try LIRA live!](https://lira--p7yl6268qj.expo.app)
+
+A pre-populated reviewer account is available. On the login page, use the dedicated button or sign in with email using the following credentials:
+
+- **Email**: reviewer@cikm.com
+- **Password**: 123456
 
 ## 📸 App Screenshots
 
