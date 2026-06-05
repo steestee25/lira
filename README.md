@@ -18,13 +18,14 @@ A pre-populated reviewer account is available. On the login page, use the dedica
 
 ## 📸 App Screenshots
 
-### Mobile
-
-| Questionnaire | Home | Transactions | AI Chat |
-|------ --------|------|-------------|----------|
-| ![Questionnaire](./z_readme_images/questionnaire_web_paper.jpg) |  ![Home](./z_readme_images/home_expenses.jpg) | ![Chat](./z_readme_images/chat_web_paper.jpg) | ![Transactions](./z_readme_images/transaction_web_paper.jpg.png) |
-
 ### Web
+<img src="./z_readme_images/questionnaire_web_paper.jpg" width="45%">
+<img src="./z_readme_images/chat_web_paper.jpg" width="45%">
+<img src="./z_readme_images/home_expenses.jpg" width="45%">
+<img src="./z_readme_images/transaction_web_paper.jpg.png" width="45%">
+
+
+### Mobile
 
 | Desktop Dashboard | Account Management | Analysis |
 |------------------|----------------|---------|
