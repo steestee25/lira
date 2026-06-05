@@ -1,4 +1,5 @@
 import { COLORS } from '@/constants/color';
+import { useTranslation } from '@/lib/i18n';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -13,30 +14,6 @@ interface AnswerAnimationProps {
   phase: AnimationPhase;
   hideSpinner?: boolean;
 }
-
-const STEPS = [
-  {
-    key: 'fetching' as AnimationPhase,
-    title: 'Ricerca informazioni',
-    subtitle: 'Recupero le fonti rilevanti',
-    icon: 'search-sharp',
-    iconComponent: Ionicons,
-  },
-  {
-    key: 'reasoning' as AnimationPhase,
-    title: 'Analisi e ragionamento',
-    subtitle: 'Comprendo il contesto',
-    icon: 'brain',
-    iconComponent: MaterialCommunityIcons,
-  },
-  {
-    key: 'generating' as AnimationPhase,
-    title: 'Generazione risposta',
-    subtitle: 'Stesura della risposta in corso...',
-    icon: 'text',
-    iconComponent: Ionicons,
-  },
-];
 
 const ESTIMATED_TIME = '1.2s';
 
@@ -103,6 +80,33 @@ export function AnswerAnimation({ phase, hideSpinner = false }: AnswerAnimationP
     };
   }, [phase, dot1, dot2, dot3]);
 
+  const { locale } = useTranslation();
+  const isEnglish = locale === 'en';
+
+  const steps = [
+    {
+      key: 'fetching' as AnimationPhase,
+      title: isEnglish ? 'Fetching information' : 'Ricerca informazioni',
+      subtitle: isEnglish ? 'Retrieving relevant sources' : 'Recupero le fonti rilevanti',
+      icon: 'search-sharp',
+      iconComponent: Ionicons,
+    },
+    {
+      key: 'reasoning' as AnimationPhase,
+      title: isEnglish ? 'Analysis & reasoning' : 'Analisi e ragionamento',
+      subtitle: isEnglish ? 'Understanding the context' : 'Comprendo il contesto',
+      icon: 'brain',
+      iconComponent: MaterialCommunityIcons,
+    },
+    {
+      key: 'generating' as AnimationPhase,
+      title: isEnglish ? 'Generating answer' : 'Generazione risposta',
+      subtitle: isEnglish ? 'Drafting the response...' : 'Stesura della risposta in corso...',
+      icon: 'text',
+      iconComponent: Ionicons,
+    },
+  ];
+
   const pulseScale = pulseValue.interpolate({
     inputRange: [0, 1],
     outputRange: [1, 1.06],
@@ -112,10 +116,10 @@ export function AnswerAnimation({ phase, hideSpinner = false }: AnswerAnimationP
     return <></>;
   }
 
-  const activeIndex = STEPS.findIndex(step => step.key === phase);
+  const activeIndex = steps.findIndex(step => step.key === phase);
   const isComplete = phase === 'complete';
-  const title = isComplete ? 'Risposta generata' : 'Sto lavorando...';
-  const subtitle = isComplete ? 'Risposta pronta' : 'Ricerco, analizzo e genero la risposta';
+  const title = isComplete ? (isEnglish ? 'Response generated' : 'Risposta generata') : (isEnglish ? 'Working...' : 'Sto lavorando...');
+  const subtitle = isComplete ? (isEnglish ? 'Answer ready' : 'Risposta pronta') : (isEnglish ? 'Fetching, analyzing and generating the response' : 'Ricerco, analizzo e genero la risposta');
 
   return (
     <View style={[styles.container, collapsed && styles.containerCollapsed]}>
@@ -144,10 +148,10 @@ export function AnswerAnimation({ phase, hideSpinner = false }: AnswerAnimationP
           <>
             <View style={styles.card}>
               <View style={styles.stepsWrapper}>
-                {STEPS.map((step, index) => {
+                {steps.map((step, index) => {
                   const isActive = !isComplete && index === activeIndex;
                   const iconBackground = isActive ? '#EEF2FF' : '#F8FAFC';
-                  const subtitleText = step.key === 'fetching' && isComplete ? '3 fonti trovate' : step.subtitle;
+                  const subtitleText = step.key === 'fetching' && isComplete ? (isEnglish ? '3 sources found' : '3 fonti trovate') : step.subtitle;
                   const IconComponent = step.iconComponent;
 
                   return (
@@ -161,7 +165,7 @@ export function AnswerAnimation({ phase, hideSpinner = false }: AnswerAnimationP
                         >
                           <IconComponent name={step.icon as any} size={24} color="#000000" />
                         </Animated.View>
-                        {index < STEPS.length - 1 ? <View style={[styles.stepConnector, { backgroundColor: '#E2E8F0' }]} /> : null}
+                        {index < steps.length - 1 ? <View style={[styles.stepConnector, { backgroundColor: '#E2E8F0' }]} /> : null}
                       </View>
                       <View style={styles.stepTextWrapper}>
                         <Text style={styles.stepTitle}>{step.title}</Text>

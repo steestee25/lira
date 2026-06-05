@@ -201,8 +201,8 @@ export const appStyles = StyleSheet.create({
   categoriesContainer: {
     backgroundColor: '#FFFFFF',
     borderBottomColor: '#E2E8F0',
+    marginTop: '-6%',
     maxHeight: 56,
-    marginBottom: 8,
     marginLeft: -16,
     marginRight: -16,
   },

@@ -195,6 +195,7 @@ export default function Chat(): React.JSX.Element {
   const [ragPhase, setRagPhase] = useState<'idle' | 'fetching' | 'reasoning' | 'generating' | 'complete'>('idle');
   const [streamingText, setStreamingText] = useState<string>('');
   const [retrievedDocs, setRetrievedDocs] = useState<{ id: string; text: string; metadata?: { source_title?: string; source_url?: string; answer?: string } }[]>([]);
+  const [currentSources, setCurrentSources] = useState<{ id: string; text: string; metadata?: { source_title?: string; source_url?: string; answer?: string } }[]>([]);
   const [selectedSources, setSelectedSources] = useState<{ id: string; text: string; metadata?: { source_title?: string; source_url?: string; answer?: string } }[]>([]);
   const [showSources, setShowSources] = useState<boolean>(false);
   const [sourcesSheetVisible, setSourcesSheetVisible] = useState<boolean>(false);
@@ -234,62 +235,9 @@ export default function Chat(): React.JSX.Element {
   const isSendingRef = useRef(false);
   const isInitializedRef = useRef(false);
 
-  const mockSources = [
-    {
-      id: 'chunk-1',
-      text: 'Bilancio mensile di maggio con spese per alimenti, trasporti e abbonamenti.',
-      metadata: {
-        source_title: 'Report mensile spese',
-        source_url: 'https://example.com/report-mensile',
-        answer: 'Suddivisione delle spese mensili per categorie primarie.',
-      },
-    },
-    {
-      id: 'chunk-2',
-      text: 'Consigli per ridurre le uscite superflue e aumentare il risparmio.',
-      metadata: {
-        source_title: 'Guida al risparmio',
-        source_url: 'https://example.com/guida-risparmio',
-        answer: 'Strategie pratiche per tagliare costi e mettere da parte soldi.',
-      },
-    },
-    {
-      id: 'chunk-3',
-      text: 'Statistiche sui movimenti bancari, evidenziando trasferimenti ricorrenti.',
-      metadata: {
-        source_title: 'Analisi movimenti',
-        source_url: 'https://example.com/analisi-movimenti',
-        answer: 'Frequenza e volume dei pagamenti ricorrenti nel periodo selezionato.',
-      },
-    },
-    {
-      id: 'chunk-4',
-      text: 'Elenco delle fonti finanziarie con note su rendimento e costi associati.',
-      metadata: {
-        source_title: 'Fonte finanziaria',
-        source_url: 'https://example.com/fonte-finanziaria',
-        answer: 'Paragone tra prodotti di investimento e costi di gestione.',
-      },
-    },
-    {
-      id: 'chunk-5',
-      text: 'Suggerimento per ottimizzare l’abbonamento telefonico e le utility.',
-      metadata: {
-        source_title: 'Ottimizzazione bollette',
-        source_url: 'https://example.com/ottimizzazione',
-        answer: 'Azioni consigliate per ridurre le bollette e i costi telefonici.',
-      },
-    },
-    {
-      id: 'chunk-6',
-      text: 'Raccomandazioni per la pianificazione di un fondo emergenze.',
-      metadata: {
-        source_title: 'Fondo emergenze',
-        source_url: 'https://example.com/fondo-emergenze',
-        answer: 'Passi per costruire un fondo di emergenza a tre mesi.',
-      },
-    },
-  ];
+  const getLocalizedCategoryName = (category: Category): string => {
+    return locale?.startsWith('en') ? category.nameEn : category.name;
+  };
 
   // Listen for reset messages from header button
   useEffect(() => {
@@ -466,6 +414,7 @@ export default function Chat(): React.JSX.Element {
     setShowSources(false);
     setSourcesSheetVisible(false);
     setSelectedSources([]);
+    setCurrentSources([]);
     setStreamingText('');
 
     try {
@@ -474,10 +423,12 @@ export default function Chat(): React.JSX.Element {
       if (ragEnabled) {
         setRagPhase('fetching');
         setRetrievedDocs([]);
+        setCurrentSources([]);
 
         try {
           retrievedDocsData = await retrieveRelevant(messageToSend, { k: 6, minScore: 0.05 });
           setRetrievedDocs(retrievedDocsData);
+          setCurrentSources(retrievedDocsData);
         } catch (error) {
           console.warn('Retrieval failed:', error);
         }
@@ -503,9 +454,10 @@ export default function Chat(): React.JSX.Element {
           })
           .join('\n\n');
 
-        systemMessage = `Sei un assistente di finanza personale. ${getProficiencyInstruction()}
+        /*${getProficiencyInstruction()}*/
+        systemMessage = `Sei un assistente di finanza personale. 
 
-          REGOLE: Rispondi SOLO usando i documenti seguenti. Non inventare. Non dare consigli specifici di investimento. Rispondi in italiano in modo conciso.
+          REGOLE: Rispondi usando esclusivamente le informazioni contenute nei documenti seguenti. Non inventare nulla. Non dare consigli specifici di investimento. Rispondi in italiano in modo conciso.
 
           ${safeRetrievedText}`;
 
@@ -657,7 +609,9 @@ export default function Chat(): React.JSX.Element {
       <View style={appStyles.content}>
         {(isPreparingModel || isInitializingModels) && (
           <View style={appStyles.card}>
-            <Text style={appStyles.subtitle}>Preparazione del modello</Text>
+            <Text style={appStyles.subtitle}>
+              {locale?.startsWith('en') ? 'Preparing model' : 'Preparazione del modello'}
+            </Text>
             <Text style={appStyles.subtitle2}>{MODEL_ALIAS}</Text>
             <ProgressBar progress={progress} />
             {modelLoadError ? (
@@ -701,7 +655,7 @@ export default function Chat(): React.JSX.Element {
                       selectedCategory === category.id && appStyles.categoryChipTextActive
                     ]}
                   >
-                    {category.name}
+                    {getLocalizedCategoryName(category)}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -714,11 +668,11 @@ export default function Chat(): React.JSX.Element {
               onSendMessage={() => handleSendMessage()}
               isGenerating={isGenerating}
               streamingText={streamingText}
-              showSourcesButton={showSources && retrievedDocs.length > 0}
+              showSourcesButton={currentSources.length > 0}
               answerPhase={ragPhase}
               isFirstQuestion={conversation.length === 1}
-              onOpenSources={(sources) => {
-                setSelectedSources(sources.map(source => ({ ...source })));
+              onOpenSources={() => {
+                setSelectedSources(currentSources.map(source => ({ ...source })));
                 setSourcesSheetVisible(true);
               }}
             />
@@ -746,7 +700,9 @@ export default function Chat(): React.JSX.Element {
                   <View style={appStyles.sheetHeader}>
                     <View style={appStyles.sheetTitleRow}>
                       <View style={appStyles.sheetTitleContainer}>
-                        <Text style={appStyles.sheetTitle}>Fonti recuperate</Text>
+                        <Text style={appStyles.sheetTitle}>
+                          {locale?.startsWith('en') ? 'Retrieved Sources' : 'Fonti recuperate'}
+                        </Text>
                         <Text style={appStyles.sheetCount}>{selectedSources.length}</Text>
                       </View>
                       <View style={appStyles.iconClose}>
@@ -852,7 +808,9 @@ export default function Chat(): React.JSX.Element {
                           {renderIcon(QUESTION_CATEGORIES.find(c => c.id === selectedCategory)!.iconConfig, '#1E293B')}
                         </View>
                         <Text style={appStyles.modalTitle}>
-                          {QUESTION_CATEGORIES.find(c => c.id === selectedCategory)!.name}
+                          {selectedCategory
+                            ? getLocalizedCategoryName(QUESTION_CATEGORIES.find(c => c.id === selectedCategory)!)
+                            : ''}
                         </Text>
                       </View>
                       <TouchableOpacity
