@@ -5,7 +5,7 @@ A cross-platform personal finance assistant combining on-device Small Language M
 
 ## 🎥 Demo Video
 
-[Watch the app demo video to discover all features in action!](https://drive.google.com/file/d/1sfO1B7OuRm3lwv_VObkiJ7GJNKbacw3U/view?usp=sharing)
+[Watch the app demo video to discover all features in action!](https://drive.google.com/file/d/1v2SyGfucXcInIqXKV7SoNUo03cOJ6qfH/view?usp=sharing)
 
 ## 🌐 Live Application
 
