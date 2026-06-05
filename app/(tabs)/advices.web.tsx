@@ -1,4 +1,5 @@
 import { Feather } from '@expo/vector-icons'
+import { useIsFocused } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
@@ -11,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { useIsFocused } from '@react-navigation/native'
 import { PieChart } from 'react-native-gifted-charts'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Source, SourcesDisplay } from '../../components/SourcesDisplay'
@@ -474,15 +474,20 @@ export default function Advices() {
     })
 
   const getRangeText = () => {
-    if (period === 'month') return ''
     const today = new Date()
-    const end = new Date(today.getTime())
     const start = new Date(today.getTime())
-    if (period === '3months') {
+    const end = new Date(today.getTime())
+
+    if (period === 'month') {
+      start.setDate(1)
+      const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+      end.setTime(nextMonth.getTime() - 1)
+    } else if (period === '3months') {
       start.setMonth(start.getMonth() - 3)
     } else {
       start.setFullYear(start.getFullYear() - 1)
     }
+
     return `${formatDate(start)} - ${formatDate(end)}`
   }
 
@@ -589,14 +594,10 @@ export default function Advices() {
         })}
       </View>
 
-      {/* Period range display (day-based for 3 months / year) */}
-      {period !== 'month' ? (
-        <View style={{ marginTop: '2%', alignItems: 'center', borderWidth: 0.5, 
-        borderColor: '#e0e0e0', backgroundColor: COLORS.white, alignSelf: 'center',
-        paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
-          <Text style={{ color: '#666', fontSize: 13, fontWeight: '450' }}>{getRangeText()}</Text>
-        </View>
-      ) : null}
+      {/* Period range display */}
+      <View style={{ marginTop: '2%', alignItems: 'center', borderWidth: 0.5, borderColor: '#e0e0e0', backgroundColor: COLORS.white, alignSelf: 'center', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
+        <Text style={{ color: '#666', fontSize: 13, fontWeight: '450' }}>{getRangeText()}</Text>
+      </View>
 
       {/* Pie chart */}
       {pieData.length > 0 && (

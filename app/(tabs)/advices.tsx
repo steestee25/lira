@@ -6,10 +6,9 @@ import {
   Platform,
   RefreshControl,
   ScrollView,
-  Switch,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import { PieChart } from 'react-native-gifted-charts'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -658,6 +657,31 @@ export default function Advices() {
     fetchAndGenerate()
   }
 
+  const formatDate = (d: Date) =>
+    d.toLocaleDateString(locale === 'it' ? 'it-IT' : 'en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    })
+
+  const getRangeText = () => {
+    const today = new Date()
+    const start = new Date(today.getTime())
+    const end = new Date(today.getTime())
+
+    if (period === 'month') {
+      start.setDate(1)
+      const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+      end.setTime(nextMonth.getTime() - 1)
+    } else if (period === '3months') {
+      start.setMonth(start.getMonth() - 3)
+    } else {
+      start.setFullYear(start.getFullYear() - 1)
+    }
+
+    return `${formatDate(start)} - ${formatDate(end)}`
+  }
+
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   if (authLoading) {
@@ -675,17 +699,7 @@ export default function Advices() {
         <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#333' }}>
           {t ? t('tabs.analysis') : 'Consigli'}
         </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={{ marginRight: 8, color: '#333', fontSize: 13 }}>
-            {useLocalModel ? 'On-device' : 'Fallback'}
-          </Text>
-          <Switch
-            value={useLocalModel}
-            onValueChange={setUseLocalModel}
-            trackColor={{ false: '#767577', true: COLORS.primary }}
-            thumbColor="#fff"
-          />
-        </View>
+        
       </View>
 
       {/* Period selector */}
@@ -720,6 +734,11 @@ export default function Advices() {
             </TouchableOpacity>
           )
         })}
+      </View>
+
+      {/* Period range display */}
+      <View style={{ marginTop: 12, alignItems: 'center', borderWidth: 0.5, borderColor: '#e0e0e0', backgroundColor: COLORS.white, alignSelf: 'center', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12 }}>
+        <Text style={{ color: '#666', fontSize: 13, fontWeight: '450' }}>{getRangeText()}</Text>
       </View>
 
       {/* Pie Chart */}
