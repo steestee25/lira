@@ -41,7 +41,7 @@ if (Platform.OS !== 'web') {
 
 const MODEL_FILENAME = 'gemma-3-1b-it-Q8_0.gguf'
 const MODEL_DOWNLOAD_URL =
-  'https://huggingface.co/NikolayKozloff/gemma-3-1b-it-Q8_0-GGUF/resolve/main/gemma-3-1b-it-Q8_0.gguf'
+  'https://huggingface.co/unsloth/gemma-3-1b-it-GGUF/resolve/main/gemma-3-1b-it-Q8_0.gguf'
 
 type PeriodType = 'month' | '3months' | 'year'
 
@@ -252,7 +252,7 @@ function tryRepairAndParse(raw: string): any | null {
       return key
     })
     return JSON.parse(deduped)
-  } catch {}
+  } catch { }
 
   try {
     let s = raw.trim()
@@ -261,7 +261,7 @@ function tryRepairAndParse(raw: string): any | null {
     const missing = opens - closes
     if (missing > 0) s = s + '}'.repeat(missing)
     return JSON.parse(s)
-  } catch {}
+  } catch { }
 
   return null
 }
@@ -355,6 +355,8 @@ export default function Advices() {
 
   const getModelPath = () => `${RNFS.DocumentDirectoryPath}/${MODEL_FILENAME}`
 
+  const MIN_MODEL_SIZE = 500_000_000 // 500 MB — soglia minima ragionevole
+
   const initModel = async () => {
     setModelLoading(true)
     setModelError(null)
@@ -365,15 +367,33 @@ export default function Advices() {
       const exists = await RNFS.exists(path)
       console.log('[Model] file exists:', exists)
 
-      if (!exists) {
+      if (exists) {
+        const stat = await RNFS.stat(path)
+        console.log('[Model] cached file size:', stat.size, 'bytes')
+        if (stat.size < MIN_MODEL_SIZE) {
+          console.warn('[Model] file corrotto — eliminazione e re-download…')
+          await RNFS.unlink(path)
+        }
+      }
+      if (!(await RNFS.exists(path))) {
         console.log('[Model] starting download from:', MODEL_DOWNLOAD_URL)
         setStatusText('Download modello in corso…')
         const dl = await RNFS.downloadFile({
           fromUrl: MODEL_DOWNLOAD_URL,
           toFile: path,
+          progressDivider: 5, // callback ogni 5% invece che ogni byte
+          begin: (res: any) => {
+            console.log('[Model] download started — expected size:', res.contentLength, 'bytes')
+            setStatusText('Download: 0%')
+          },
           progress: (res: any) => {
+            if (!res.contentLength || res.contentLength <= 0) {
+              console.log(`[Model] download ${res.bytesWritten} bytes (size unknown)`)
+              setStatusText(`Download: ${Math.round(res.bytesWritten / 1_000_000)} MB…`)
+              return
+            }
             const pct = Math.round((res.bytesWritten / res.contentLength) * 100)
-            console.log(`[Model] download ${pct}% (${res.bytesWritten}/${res.contentLength})`)
+            console.log(`[Model] download ${pct}% — ${Math.round(res.bytesWritten / 1_000_000)}/${Math.round(res.contentLength / 1_000_000)} MB`)
             setStatusText(`Download: ${pct}%`)
           },
         }).promise
@@ -382,11 +402,8 @@ export default function Advices() {
         const stat = await RNFS.stat(path)
         console.log('[Model] file size after download:', stat.size, 'bytes')
         if (stat.size < 100_000) {
-          throw new Error(`File troppo piccolo dopo il download (${stat.size} bytes)`)
+          throw new Error(`File troppo piccolo (${stat.size} bytes)`)
         }
-      } else {
-        const stat = await RNFS.stat(path)
-        console.log('[Model] cached file size:', stat.size, 'bytes')
       }
 
       if (contextRef.current) {
@@ -445,13 +462,13 @@ export default function Advices() {
 
   const fetchAndGenerate = async () => {
     if (!session?.user) return
-    
+
     // Prevent concurrent fetch calls
     if (isFetchingRef.current) {
       console.warn('[Fetch] already fetching — skipping request')
       return
     }
-    
+
     isFetchingRef.current = true
     setLoading(true)
     setAdvices([])
@@ -477,11 +494,11 @@ export default function Advices() {
 
       // 2. Build pie data and summary
       const total = rows.reduce((s: number, r: any) => s + (r.total ?? 0), 0)
-      
+
       // Find index of highest expense category
-      const maxIndex = rows.reduce((acc: number, cur: any, i: number) => 
+      const maxIndex = rows.reduce((acc: number, cur: any, i: number) =>
         (cur.total > (rows[acc]?.total || 0) ? i : acc), 0)
-      
+
       const mapped = rows.map((r: any, idx: number) => {
         const base = (categoryColors[r.category] && categoryColors[r.category][0]) || '#CCCCCC'
         const gradBase = (categoryColors[r.category] && categoryColors[r.category][1]) || base
@@ -534,7 +551,7 @@ export default function Advices() {
 
   // ─── Prompt & inference ────────────────────────────────────────────────────
 
-  
+
   const buildPrompt = (summary: any): string => {
     const cats = summary.topCategories
       .map((c: any) => `${c.category} €${c.total} (${c.pct}%)`)
@@ -561,7 +578,7 @@ export default function Advices() {
       `<end_of_turn>\n` +
       `<start_of_turn>model\n`
     )
-    
+
   }
 
   const generateWithLocalModel = async (summary: any) => {
@@ -615,7 +632,7 @@ export default function Advices() {
     } catch (e: any) {
       const errMsg = e?.message ?? String(e)
       console.error('[Inference] error:', errMsg)
-      
+
       // If context is busy, try to reinitialize it
       if (errMsg.includes('busy') || errMsg.includes('Context')) {
         console.log('[Inference] context is busy — reinitializing…')
@@ -630,7 +647,7 @@ export default function Advices() {
           console.error('[Inference] reinit failed:', reinitErr)
         }
       }
-      
+
       // Use fallback
       generateFallback(summary)
     } finally {
@@ -699,7 +716,7 @@ export default function Advices() {
         <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#333' }}>
           {t ? t('tabs.analysis') : 'Consigli'}
         </Text>
-        
+
       </View>
 
       {/* Period selector */}
@@ -709,13 +726,13 @@ export default function Advices() {
             p === 'month'
               ? (t ? t('advicesLabels.lastMonth') : 'Ultimo mese')
               : p === '3months'
-              ? (t ? t('advicesLabels.threeMonths') : '3 Mesi')
-              : (t ? t('advicesLabels.lastYear') : "Quest'anno")
+                ? (t ? t('advicesLabels.threeMonths') : '3 Mesi')
+                : (t ? t('advicesLabels.lastYear') : "Quest'anno")
           return (
             <TouchableOpacity
               key={p}
               onPress={async () => {
-                try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light) } catch {}
+                try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light) } catch { }
                 setPeriod(p)
                 setSelectedIndex(null)
               }}
@@ -756,9 +773,15 @@ export default function Advices() {
             innerCircleColor={'#F5F5F5'}
             centerLabelComponent={() => <View />}
           />
-          <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10, flexWrap: 'wrap' }}>
+          <View style={{
+            flexDirection: 'row', justifyContent: 'center', marginTop: 10,
+            marginLeft: '5%', flexWrap: 'wrap'
+          }}>
             {(selectedIndex !== null ? [pieData[selectedIndex]].filter(Boolean) : pieData).map((p) => (
-              <View key={p.label} style={{ flexDirection: 'row', alignItems: 'center', width: 150, marginRight: 12, marginBottom: 6 }}>
+              <View key={p.label} style={{
+                flexDirection: 'row', alignItems: 'center',
+                width: 150, marginLeft: 25, marginBottom: 6
+              }}>
                 <View style={{ height: 10, width: 10, borderRadius: 5, backgroundColor: p.color, marginRight: 10 }} />
                 <Text style={{ color: 'black', fontSize: 12 }}>
                   {p.label}: {Math.round((p.value / Math.max(1, pieData.reduce((s, x) => s + x.value, 0))) * 100)}%

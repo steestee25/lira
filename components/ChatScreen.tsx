@@ -49,7 +49,7 @@ export default function ChatScreen({
   answerPhase = 'idle',
   isFirstQuestion = false,
 }: Props): React.JSX.Element {
-  const { locale } = useTranslation();
+  const { locale, t } = useTranslation();
   const placeholderText = locale === 'en' ? 'Ask a question' : 'Fai una domanda';
   const visibleMessages = conversation.slice(1);
   const userQuestionCount = visibleMessages.filter(msg => msg.role === 'user').length;
@@ -114,7 +114,7 @@ export default function ChatScreen({
 
                       {showSourcesButton && msg.sources?.length ? (
                         <TouchableOpacity style={styles.sourcesButton} onPress={() => onOpenSources(msg.sources || [])}>
-                          <Text style={styles.sourcesButtonText}>Fonti</Text>
+                          <Text style={styles.sourcesButtonText}>{t('chat.sources')}</Text>
                           <Feather name="chevron-down" size={16} color="#000" style={{ marginLeft: 8 }} />
                         </TouchableOpacity>
                       ) : null}

@@ -25,6 +25,10 @@
         "language": {
             "select": "Select Language"
         },
+        "chat": {
+            "sources": "Sources",
+            "retrievedSources": "Retrieved Sources"
+        },
         "errorDialog": {
             "title": "Oops!",
             "ok": "OK"
@@ -34,7 +38,10 @@
         },
         "auth": {
             "initialStep": {
-                "buttonNext": "Login with Email"
+                "buttonNext": "Login with Email",
+                "orLabel": "or",
+                "existingProfileTitle": "Access an existing profile",
+                "existingProfileSubtitle": "For reviewers only"
             },
             "emailStep": {
                 "title": "Enter your email",
@@ -295,6 +302,10 @@
         "language": {
             "select": "Seleziona Lingua"
         },
+        "chat": {
+            "sources": "Fonti",
+            "retrievedSources": "Fonti recuperate"
+        },
         "errorDialog": {
             "title": "Ops!",
             "ok": "OK"
@@ -304,7 +315,10 @@
         },
         "auth": {
             "initialStep": {
-                "buttonNext": "Login con Email"
+                "buttonNext": "Login con Email",
+                "orLabel": "oppure",
+                "existingProfileTitle": "Accedi direttamente al profilo già creato",
+                "existingProfileSubtitle": "Solo per revisori"
             },
             "emailStep": {
                 "title": "Inserisci la tua email",

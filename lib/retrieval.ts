@@ -276,6 +276,10 @@ export async function retrieveRelevant(
     }
 
     const normalizedQuery = normalizeSearchText(query);
+    if (!normalizedQuery) {
+      console.log('retrieveRelevant got empty query, returning no documents');
+      return [];
+    }
     const queryTerms = normalizedQuery
       .split(/\s+/)
       .filter(term => term.length > 2 && !['quando','possiamo','dire','che','per','con','di','e','o','ma','non','se'].includes(term));

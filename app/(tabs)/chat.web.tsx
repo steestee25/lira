@@ -203,7 +203,7 @@ type ModelChoice = 'call_gemma_1b' | 'call_gemma_270m' | 'call_smollm3';
 export default function Chat(): React.JSX.Element {
 
   const { rag, resetMessages } = useLocalSearchParams();
-  const { locale } = useTranslation();
+  const { locale, t } = useTranslation();
 
   const INITIAL_CONVERSATION: Message[] = [
     {
@@ -396,7 +396,7 @@ export default function Chat(): React.JSX.Element {
             {/* Header del modal */}
             <View style={styles.modalHeader}>
               <View style={styles.headerWithBadge}>
-                <Text style={styles.modalTitle}>Fonti recuperate</Text>
+                <Text style={styles.modalTitle}>{t('chat.retrievedSources')}</Text>
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>{currentSources.length}</Text>
                 </View>
@@ -603,12 +603,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    maxHeight: '85%',
+    maxHeight: '80%',
     maxWidth: 768,
     width: '100%',
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 28,
+    paddingBottom: 7,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,

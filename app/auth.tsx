@@ -59,8 +59,14 @@ export default function AuthScreen() {
     return () => handler.remove()
   }, [step]) // Dependency only on step - setAuthStep doesn't need to be included
 
-  const handleAuth = async (mode: 'signIn' | 'signUp') => {
-    if (!email || !password) {
+  const handleAuth = async (
+    mode: 'signIn' | 'signUp',
+    credentials?: { email: string; password: string }
+  ) => {
+    const emailToUse = credentials?.email ?? email
+    const passwordToUse = credentials?.password ?? password
+
+    if (!emailToUse || !passwordToUse) {
       setErrorMessage('Please enter email and password')
       return
     }
@@ -75,10 +81,15 @@ export default function AuthScreen() {
       beginOnboarding()
     }
 
+    if (credentials) {
+      setEmail(emailToUse)
+      setPassword(passwordToUse)
+    }
+
     const action =
       mode === 'signIn'
-        ? supabase.auth.signInWithPassword({ email, password })
-        : supabase.auth.signUp({ email, password })
+        ? supabase.auth.signInWithPassword({ email: emailToUse, password: passwordToUse })
+        : supabase.auth.signUp({ email: emailToUse, password: passwordToUse })
 
     const { error } = await action
 
@@ -163,7 +174,16 @@ export default function AuthScreen() {
           keyboardShouldPersistTaps="always"
         >
           {step === 'initial' && (
-            <InitialStep onNext={() => setAuthStep('email')} loading={loading} />
+            <InitialStep
+              onNext={() => setAuthStep('email')}
+              onAccessExisting={async () => {
+                await handleAuth('signIn', {
+                  email: 'reviewer@cikm.com',
+                  password: '123456',
+                })
+              }}
+              loading={loading}
+            />
           )}
 
           {step === 'email' && (

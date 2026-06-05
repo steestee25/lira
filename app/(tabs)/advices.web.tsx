@@ -630,7 +630,7 @@ export default function Advices() {
       {/* Advice list */}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        style={{ paddingHorizontal: HORIZONTAL_GUTTER, marginTop: '2%', marginBottom: '5%' }}
+        style={{ paddingHorizontal: HORIZONTAL_GUTTER, marginTop: '-1%', marginBottom: '5%' }}
         contentContainerStyle={{ paddingBottom: insets.bottom + 96 }}
         refreshControl={
           <RefreshControl
@@ -740,7 +740,7 @@ export default function Advices() {
             {/* Header del modal */}
             <View style={styles.modalHeader}>
               <View style={styles.headerWithBadge}>
-                <Text style={styles.modalTitle}>Fonti recuperate</Text>
+                <Text style={styles.modalTitle}>{t('chat.retrievedSources')}</Text>
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>{currentSources.length}</Text>
                 </View>

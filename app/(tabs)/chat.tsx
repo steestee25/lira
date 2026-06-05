@@ -30,7 +30,7 @@ import {
 } from '@/lib/modelStorage';
 import { loadProficiencyLevelWithFallback } from '@/lib/questionnaireStorage';
 import { retrieveRelevant } from '@/lib/retrieval';
-import { appStyles } from './chatStyles';
+import { appStyles } from '../../styles/components/chatStyles';
 
 // Conditionally import native modules (only available on mobile)
 let RNFS: any = null;
@@ -476,7 +476,7 @@ export default function Chat(): React.JSX.Element {
         setRetrievedDocs([]);
 
         try {
-          retrievedDocsData = await retrieveRelevant(userInput, { k: 6, minScore: 0.05 });
+          retrievedDocsData = await retrieveRelevant(messageToSend, { k: 6, minScore: 0.05 });
           setRetrievedDocs(retrievedDocsData);
         } catch (error) {
           console.warn('Retrieval failed:', error);

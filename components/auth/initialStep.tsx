@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons'
 import * as Haptics from 'expo-haptics'
 import React from 'react'
 import {
@@ -14,26 +15,36 @@ import LanguageSelector from '@/components/LanguageSelector'
 import { COLORS } from '@/constants/color'
 import { useTranslation } from '../../lib/i18n'
 
-// Receives callback and loading state as props 
 interface Props {
   onNext: () => void
+  onAccessExisting?: () => void
   loading: boolean
 }
 
-export default function InitialStep({ onNext, loading }: Props) {
+export default function InitialStep({ onNext, onAccessExisting, loading }: Props) {
   const { t, setLocale, locale } = useTranslation()
-  
+
   const handlePress = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
     onNext()
   }
 
+  const handleExistingPress = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+    if (onAccessExisting) {
+      onAccessExisting()
+      return
+    }
+    onNext()
+  }
+
   return (
-    <View style={{ width: '100%' }}>
-      <LanguageSelector 
+    <View style={styles.container}>
+      <LanguageSelector
         selectedKey={locale}
         onSelect={(lang) => setLocale(lang)}
       />
+
       <View style={styles.logoView}>
         <Image
           source={require('../../assets/images/coin_logo_no_bg.png')}
@@ -44,23 +55,44 @@ export default function InitialStep({ onNext, loading }: Props) {
 
       <Image
         source={require('../../assets/images/main3.png')}
-        style={{ width: Platform.OS === 'web' ? '65%' : '105%', height: 450, alignSelf: 'center', marginTop: Platform.OS === 'web' ? '2%' : '0%' }}
+        style={styles.heroImage}
         resizeMode="contain"
       />
 
-      <View style={[styles.verticallySpaced, styles.mt20]}>
+      <View style={styles.actionsContainer}>
         <TouchableOpacity
-          style={styles.button}
+          style={styles.primaryButton}
           onPress={handlePress}
           disabled={loading}
         >
           {loading ? (
             <ActivityIndicator color={COLORS.white} />
           ) : (
-            <View style={styles.buttonContentRow}>
-              <Text style={styles.buttonText}>{t('auth.initialStep.buttonNext')}</Text>
-            </View>
+            <Text style={styles.primaryButtonText}>{t('auth.initialStep.buttonNext')}</Text>
           )}
+        </TouchableOpacity>
+
+        <View style={styles.dividerRow}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>{t('auth.initialStep.orLabel')}</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={handleExistingPress}
+          disabled={loading}
+        >
+          <View style={styles.secondaryContent}>
+            <View style={styles.secondaryIcon}>
+              <Ionicons name="person-circle-outline" size={28} color={COLORS.primary} />
+            </View>
+
+            <View style={styles.secondaryTextGroup}>
+              <Text style={styles.secondaryTitle}>{t('auth.initialStep.existingProfileTitle')}</Text>
+              <Text style={styles.secondarySubtitle}>{t('auth.initialStep.existingProfileSubtitle')}</Text>
+            </View>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -68,45 +100,110 @@ export default function InitialStep({ onNext, loading }: Props) {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    alignItems: 'center',
+    position: 'relative',
+    paddingHorizontal: 20,
+  },
   logoView: {
     height: 80,
     width: 80,
     backgroundColor: COLORS.temp2,
-    alignContent: 'center',
+    alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
-    borderRadius: 20,
+    borderRadius: 24,
     marginTop: Platform.OS === 'web' ? '3%' : '10%',
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 60,
+    height: 60,
+  },
+  heroImage: {
+    width: '100%',
+    maxWidth: 520,
+    height: 450,
     alignSelf: 'center',
+    marginTop: Platform.OS === 'web' ? '-6%' : '-10%',
   },
-  verticallySpaced: {
-    paddingVertical: 4,
-    alignSelf: 'stretch',
+  actionsContainer: {
+    width: '100%',
+    maxWidth: 520,
+    marginTop: Platform.OS === 'web' ? '-5%' : '-10%',
   },
-  mt20: {
-    marginTop: Platform.OS === 'web' ? '5%' : '0%',
-  },
-  button: {
-    backgroundColor: COLORS.primaryLight,
-    padding: 15,
+  primaryButton: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
     alignItems: 'center',
-    borderRadius: 15,
+    borderRadius: 18,
+    shadowColor: COLORS.temp,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  buttonIcon: {
-    marginRight: 8
+  primaryButtonText: {
+    color: COLORS.white,
+    fontWeight: '700',
+    fontSize: 16,
   },
-  buttonContentRow: {
+  dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginVertical: 18,
   },
-  buttonText: {
-    color: COLORS.white,
-    fontWeight: 'bold',
-    fontSize: 16
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#d1d5db',
+  },
+  dividerText: {
+    marginHorizontal: 12,
+    color: '#64748b',
+    fontSize: 12,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+  },
+  secondaryButton: {
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    borderRadius: 18,
+    padding: 16,
+    shadowColor: COLORS.temp,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  secondaryContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  secondaryIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: COLORS.primaryLightOpacity,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  secondaryTextGroup: {
+    flex: 1,
+    marginLeft: 14,
+  },
+  secondaryTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0f172a',
+  },
+  secondarySubtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#475569',
   },
 })
