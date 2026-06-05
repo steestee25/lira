@@ -1,4 +1,4 @@
-# 💰 LIRA - Personal Finance Chatbot for Italian Language
+# # <img src="./assets/images/coin_logo_no_bg.png" alt="LIRA" width="40"> LIRA - Personal Finance Chatbot for Italian Language LIRA - Personal Finance Chatbot for Italian Language
 
 A cross-platform personal finance assistant combining on-device Small Language Models (SLMs), Retrieval-Augmented Generation (RAG), and personalized financial analytics. LIRA supports users in understanding personal finance concepts through natural language interaction, personalized financial profiling, transaction tracking, and spending analysis.
 
