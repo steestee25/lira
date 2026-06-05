@@ -1,8 +1,12 @@
 {
   "expo": {
-    "name": "YourMoney",
-    "displayName": "YourMoney",
-    "scheme": "com.stefano10.yourmoney",
+    "name": "Lira",
+    "displayName": "Lira",
+    "scheme": "com.stefano10.lira",
+    "web": {
+      "output": "server",
+      "bundler": "metro"
+    },
     "plugins": [
       [
         "expo-build-properties",
@@ -21,8 +25,13 @@
       "expo-font"
     ],
     "android": {
-      "package": "com.stefano10.yourmoney",
+      "package": "com.stefano10.lira",
       "newArchEnabled": false
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8ba813fa-fa1c-417e-87be-d0950e10434e"
+      }
     }
   }
 }

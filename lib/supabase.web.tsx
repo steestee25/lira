@@ -2,16 +2,21 @@ import { createClient } from "@supabase/supabase-js";
 import * as aesjs from 'aes-js';
 import 'react-native-get-random-values';
 
+// Controlla se siamo nel browser o in Node.js (SSR/build)
+const isBrowser = typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+
 // Web-compatible storage using localStorage
 class WebSecureStore {
   private storageKey = 'supabase_encryption_keys';
 
   private getKeys(): Record<string, string> {
+    if (!isBrowser) return {};
     const stored = localStorage.getItem(this.storageKey);
     return stored ? JSON.parse(stored) : {};
   }
 
   private saveKeys(keys: Record<string, string>) {
+    if (!isBrowser) return;
     localStorage.setItem(this.storageKey, JSON.stringify(keys));
   }
 
@@ -44,15 +49,14 @@ class WebSecureStore {
   }
 
   async getItem(key: string) {
+    if (!isBrowser) return null;  // ← SSR: nessuna sessione disponibile
     const encrypted = localStorage.getItem(key);
-    if (!encrypted) {
-      return null;
-    }
-
+    if (!encrypted) return null;
     return await this._decrypt(key, encrypted);
   }
 
   async removeItem(key: string) {
+    if (!isBrowser) return;
     localStorage.removeItem(key);
     const keys = this.getKeys();
     delete keys[key];
@@ -60,6 +64,7 @@ class WebSecureStore {
   }
 
   async setItem(key: string, value: string) {
+    if (!isBrowser) return;
     const encrypted = await this._encrypt(key, value);
     localStorage.setItem(key, encrypted);
   }
@@ -78,4 +83,3 @@ const supabase = createClient(supabaseUrl, supabasePublishableKey, {
 });
 
 export { supabase };
-

@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import * as embeddings from './embeddings';
+import * as embeddings from './docStore';
 import { KNOWLEDGE_BASE } from './knowledgeBase_qa';
 
 let RNFS: any = null;
