@@ -21,12 +21,12 @@ A pre-populated reviewer account is available. On the login page, use the dedica
 ### Web
 <img src="./z_readme_images/questionnaire_web_paper.jpg" width="48%"> <img src="./z_readme_images/home_expenses.jpg" width="48%">
 <br>
-<img src="./z_readme_images/chat_web_paper.jpg" width="48%"> <img src="./z_readme_images/transaction_web_paper.jpg.png" width="48%">
+<img src="./z_readme_images/chat_web_paper.jpg" width="48%"> <img src="./z_readme_images/transaction_web_paper.jpg.png" width="30%">
 
 ### Mobile
-<img src="./z_readme_images/questionnaire_mobile.png" width="48%"> <img src="./z_readme_images/home_expenses_mobile.jpg" width="48%"> 
+<img src="./z_readme_images/questionnaire_mobile.png" width="48%"> <img src="./z_readme_images/home_expenses_mobile.jpg" width="30%"> 
 <br>
-<img src="./z_readme_images/chat_mobile.jpg" width="30%"> <img src="./z_readme_images/chat_mobile_2.jpg.jpg" width="30%"> <img src="./z_readme_images/transaction_mobile.jpg" width="30%"> 
+<img src="./z_readme_images/chat_mobile.jpg" width="30%"> <img src="./z_readme_images/chat_mobile_2.jpg" width="30%"> <img src="./z_readme_images/transaction_mobile.jpg" width="30%"> 
 
 
 ## ✨ Features

@@ -33,7 +33,7 @@ export default function EmailStep({ email, setEmail, onNext, onBack }: Props) {
 
   const handleNext = async () => {
     if (!isValidEmail(email)) {
-      setError('Email non valida')
+      setError(t('auth.emailStep.invalidEmail'))
       return
     }
     setError('')
