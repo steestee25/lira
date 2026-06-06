@@ -454,12 +454,12 @@ export default function Chat(): React.JSX.Element {
           })
           .join('\n\n');
 
-        /*${getProficiencyInstruction()}*/
-        systemMessage = `Sei un assistente di finanza personale. 
-
+          systemMessage = `Sei un assistente di finanza personale. 
+          
           REGOLE: Rispondi usando esclusivamente le informazioni contenute nei documenti seguenti. Non inventare nulla. Non dare consigli specifici di investimento. Rispondi in italiano in modo conciso.
-
-          ${safeRetrievedText}`;
+          
+          ${safeRetrievedText}
+          ${getProficiencyInstruction()}`;
 
         //systemMessage = `Sei un assistente esperto di finanza personale che risponde ESCLUSIVAMENTE sulla base dei documenti forniti.
         //${getProficiencyInstruction()}
