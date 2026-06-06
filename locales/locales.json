@@ -219,6 +219,9 @@
             "phone": "Phone",
             "country": "Country",
             "deleteAccount": "Delete Account",
+            "deleteAccountTitle": "Delete Account",
+            "deleteAccountMessage": "Are you sure you want to delete your account? This action cannot be undone.",
+            "deleteAccountConfirm": "Delete",
             "setLanguage": "Set Language"
         },
         "changePassword": {
@@ -598,6 +601,9 @@
             "phone": "Telefono",
             "country": "Paese",
             "deleteAccount": "Elimina account",
+            "deleteAccountTitle": "Elimina account",
+            "deleteAccountMessage": "Sei sicuro di voler eliminare il tuo account? Questa azione non può essere annullata.",
+            "deleteAccountConfirm": "Elimina",
             "setLanguage": "Imposta lingua"
         },
         "changePassword": {
