@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    ScrollView,
-    Text,
-    View,
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  View,
 } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
 import { COLORS } from '../constants/color';
@@ -357,7 +357,7 @@ export default function AnalysisContent({
           <View style={{ alignItems: 'center', paddingTop: 40 }}>
             <ActivityIndicator color={COLORS.primary} />
             <Text style={{ marginTop: 12, color: '#888', fontSize: 14 }}>
-              Analisi in corso…
+              {t ? t('advicesLabels.analysis') : 'Analisi in corso...'}
             </Text>
           </View>
         ) : (

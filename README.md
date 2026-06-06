@@ -24,10 +24,10 @@ A pre-populated reviewer account is available. On the login page, use the dedica
 <img src="./z_readme_images/chat_web_paper.jpg" width="48%"> <img src="./z_readme_images/transaction_web_paper.jpg.png" width="48%">
 
 ### Mobile
+<img src="./z_readme_images/questionnaire_mobile.png" width="48%"> <img src="./z_readme_images/home_expenses_mobile.jpg" width="48%"> 
+<br>
+<img src="./z_readme_images/chat_mobile.jpg" width="30%"> <img src="./z_readme_images/chat_mobile_2.jpg.jpg" width="30%"> <img src="./z_readme_images/transaction_mobile.jpg" width="30%"> 
 
-| Desktop Dashboard | Account Management | Analysis |
-|------------------|----------------|---------|
-| ![Dashboard](./assets/images/dashboard-web.png) | ![Accounts](./assets/images/accounts-web.png) | ![Analysis](./assets/images/analysis-web.png) |
 
 ## ✨ Features
 

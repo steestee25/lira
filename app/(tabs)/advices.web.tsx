@@ -387,7 +387,7 @@ export default function Advices() {
 
   const generateWithServer = async (summary: any) => {
     console.log('[Server] starting request to analyze_transaction…')
-    setStatusText('Analisi in corso…')
+    setStatusText(t ? t('advicesLabels.analysis') : 'Analisi in corso...')
 
     try {
       const payload = {
@@ -644,7 +644,7 @@ export default function Advices() {
           <View style={{ alignItems: 'center', paddingTop: 60 }}>
             <ActivityIndicator color={COLORS.primary} />
             <Text style={{ marginTop: 12, color: '#888', fontSize: 14 }}>
-              {statusText || 'Analisi in corso…'}
+              {statusText || t ? t('advicesLabels.analysis') : 'Analisi in corso...'}
             </Text>
           </View>
         ) : (

@@ -803,7 +803,7 @@ export default function Advices() {
           <View style={{ alignItems: 'center', paddingTop: 60 }}>
             <ActivityIndicator color={COLORS.primary} />
             <Text style={{ marginTop: 12, color: '#888', fontSize: 14 }}>
-              {statusText || 'Analisi in corso…'}
+              {statusText || t ? t('advicesLabels.analysis') : 'Analisi in corso...'}
             </Text>
           </View>
         ) : (

@@ -13,7 +13,8 @@
             "lastYear": "Last Year",
             "advices": "Advices",
             "modelLoading": "Loading model...",
-            "advicesGeneration": "Generating advices..."
+            "advicesGeneration": "Generating advices...",
+            "analysis": "Analysis in progress..."
         },
         "common": {
             "next": "Next",
