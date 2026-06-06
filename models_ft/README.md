@@ -106,7 +106,7 @@ After training, LoRA adapters are saved locally and can be merged or quantized f
 | Model | Hugging Face |
 |---|---|
 | SmolLM3 3B | [Stee201/gguf-server-smollm3](https://huggingface.co/Stee201/gguf-server-smollm3) |
-| Gemma 3 1B | [Stee201/gguf-server](https://huggingface.co/Stee201/gguf-server) |
+| Gemma 3 1B | [Stee201/gguf-server-q](https://huggingface.co/Stee201/gguf-server-q) |
 | Gemma 3 270M | [Stee201/gguf-server-q270](https://huggingface.co/Stee201/gguf-server-q270) |
 
 ---
