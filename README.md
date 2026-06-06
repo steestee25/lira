@@ -53,7 +53,7 @@ A pre-populated reviewer account is available. On the login page, use the dedica
 
 ### 🔍 Offline Functionality (on mobile application)
 
-- Full on-device SLM inference — financial queries never leave the user's device
+- Full on-device SLM inference - financial queries never leave the user's device
 - Automatic fallback to local SQLite cache when offline
 - Automatic synchronization when connectivity is restored
 - All SLM inference runs entirely on-device
@@ -66,11 +66,11 @@ A pre-populated reviewer account is available. On the login page, use the dedica
 
 ## 🧠 System Architecture
 LIRA consists of three main components:
-**1. Domain-Specific Dataset** — 1,740 question–answer pairs derived from CONSOB's "Investor Education" materials, covering financial planning, investments, risk management, investor protection, and more. Split into training (1,310), validation (256), and test (174) sets.
+**1. Domain-Specific Dataset** - 1,740 question–answer pairs derived from CONSOB's "Investor Education" materials, covering financial planning, investments, risk management, investor protection, and more. Split into training (1,310), validation (256), and test (174) sets.
 
-**2. Fine-Tuned Small Language Models** — Three compact open-weight models (Gemma 3 270M, Gemma 3 1B, SmolLM3 3B) adapted to the financial domain via LoRA, achieving BERTScore F1 improvements of **+7.0% to +11.7%** over few-shot baselines.
+**2. Fine-Tuned Small Language Models** - Three compact open-weight models (Gemma 3 270M, Gemma 3 1B, SmolLM3 3B) adapted to the financial domain via LoRA, achieving BERTScore F1 improvements of **+7.0% to +11.7%** over few-shot baselines.
 
-**3. Cross-Platform Application** — A sequential pipeline connecting user onboarding → conversational RAG assistance → financial tracking and analysis.
+**3. Cross-Platform Application** - A sequential pipeline connecting user onboarding → conversational RAG assistance → financial tracking and analysis.
 
 The RAG pipeline perform retrieval over the CONSOB corpus and injects the top-k passages as context before generation.
 
@@ -87,7 +87,7 @@ Before getting started, make sure you have installed:
 
 #### Additional for iOS/Android emulator
 
-- **Xcode** (for iOS) — macOS only
+- **Xcode** (for iOS) - macOS only
 - **Android Studio** (for Android)
 
 ### 1️⃣ Clone the Repository
@@ -228,43 +228,43 @@ lira/
 
 ### Framework & Navigation
 
-- **react-native** (0.79.5) — Native framework
-- **expo** (~53.0.20) — Expo platform
-- **expo-router** (~5.1.4) — File-based router
-- **react-navigation** — Navigation
+- **react-native** (0.79.5) - Native framework
+- **expo** (~53.0.20) - Expo platform
+- **expo-router** (~5.1.4) - File-based router
+- **react-navigation** - Navigation
 
 ### UI & Animations
 
-- **lottie-react-native** — Lottie animations
-- **react-native-gifted-charts** — Spending analytics charts
-- **@react-native-community/netinfo** — Network status
+- **lottie-react-native** - Lottie animations
+- **react-native-gifted-charts** - Spending analytics charts
+- **@react-native-community/netinfo** - Network status
 
 ### Backend & Database
 
-- **@supabase/supabase-js** — Supabase backend (auth, cloud sync)
-- **react-native-fs** — Filesystem access
-- **sqlite** — Local SQLite database (offline cache)
+- **@supabase/supabase-js** - Supabase backend (auth, cloud sync)
+- **react-native-fs** - Filesystem access
+- **sqlite** - Local SQLite database (offline cache)
 
 ### AI & ML
 
-- **llama.rn** — On-device SLM inference via llama.cpp (GGUF/8-bit quantized models)
+- **llama.rn** - On-device SLM inference via llama.cpp (GGUF/8-bit quantized models)
 
 ### Security & Storage
 
-- **expo-secure-store** — Secure storage
-- **@react-native-async-storage/async-storage** — Async storage
-- **aes-js** — AES encryption
+- **expo-secure-store** - Secure storage
+- **@react-native-async-storage/async-storage** - Async storage
+- **aes-js** - AES encryption
 
 ### Web & HTTP
 
-- **axios** — HTTP client
-- **react-native-web** — Web support
+- **axios** - HTTP client
+- **react-native-web** - Web support
 
 ### Development
 
-- **TypeScript** (~5.8.3) — Type checking
-- **ESLint** — Linting
-- **Expo CLI** — Build tools
+- **TypeScript** (~5.8.3) - Type checking
+- **ESLint** - Linting
+- **Expo CLI** - Build tools
 
 See [package.json](./package.json) for the complete list.
 
@@ -310,7 +310,7 @@ create table transactions (
 ```
 ### SLM Models
 
-Models are hosted on Hugging Face and downloaded on first use. After download, they reside on device storage and operate entirely offline. No additional configuration required — the app handles model fetching automatically.
+Models are hosted on Hugging Face and downloaded on first use. After download, they reside on device storage and operate entirely offline. No additional configuration required - the app handles model fetching automatically.
 
 | Model | Size | Link |
 |-------|------|------|
