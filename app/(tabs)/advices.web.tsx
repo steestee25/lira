@@ -26,7 +26,6 @@ import {
 import locales from '../../locales/locales.json'
 import { HEADER_TOP, HORIZONTAL_GUTTER } from '../../styles/spacing'
 
-// ─── Constants ───────────────────────────────────────────────────────────────
 
 const NGROK_URL = 'https://rhyme-headlamp-overnight.ngrok-free.dev'
 
@@ -37,7 +36,6 @@ interface Advice {
   category: string
 }
 
-// ─── Utility functions ──────────────────────────────────────────────────────
 
 const appendHexOpacity = (hex: string, alpha = '20') => {
   if (!hex || typeof hex !== 'string') return hex
@@ -67,7 +65,6 @@ const STATIC_ADVICES: Advice[] = [
   },
 ]
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
  * Strip markdown code fences (```json ... ``` or ``` ... ```) from model output.
@@ -199,7 +196,6 @@ function extractFallbackTexts(raw: string): Advice[] {
   return result
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
 
 export default function Advices() {
   const { session, loading: authLoading } = useAuth()
@@ -231,7 +227,6 @@ export default function Advices() {
     Object.entries(categoriesFromLocale).map(([k, v]) => [k, [(v as any).color, (v as any).color]])
   )
 
-  // ─── Helper functions ──────────────────────────────────────────────────────
 
   const getCategoryKeyFromLabel = (label: string) => {
     if (!label) return null
@@ -285,7 +280,6 @@ export default function Advices() {
     }
   }
 
-  // ─── Data fetch + advice generation ────────────────────────────────────────
 
   useEffect(() => {
     if (isFocused && !authLoading && session?.user) {
@@ -383,7 +377,6 @@ export default function Advices() {
     }
   }
 
-  // ─── Server API call ────────────────────────────────────────────────────
 
   const generateWithServer = async (summary: any) => {
     console.log('[Server] starting request to analyze_transaction…')
@@ -419,7 +412,6 @@ export default function Advices() {
       const data = await response.json()
       console.log('[Server] raw response keys:', Object.keys(data))
 
-      // ── NEW: use the dedicated parser for this server's response format ──
       const parsed = parseServerResponse(data)
       console.log('[Server] parsed advices:', parsed.length)
 
@@ -491,7 +483,6 @@ export default function Advices() {
     return `${formatDate(start)} - ${formatDate(end)}`
   }
 
-  // ─── Render ─────────────────────────────────────────────────────────────────
 
   if (authLoading) {
     return (

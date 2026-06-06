@@ -424,7 +424,7 @@ export default function Chat(): React.JSX.Element {
         </TouchableOpacity>
       </Modal>
 
-      {/* Modal per visualizzare le domande della categoria */}
+      {/* Modal for category questions */}
       <Modal
         visible={showQuestionsModal}
         animationType="fade"
@@ -447,7 +447,7 @@ export default function Chat(): React.JSX.Element {
             activeOpacity={1}
             onPress={() => { }}
           >
-            {/* Header del modal */}
+            {/* Modal header */}
             {selectedCategory && QUESTION_CATEGORIES.find(c => c.id === selectedCategory) && (
             <View style={styles.modalHeader}>
               <View style={styles.headerWithBadge}>
@@ -470,7 +470,7 @@ export default function Chat(): React.JSX.Element {
             </View>
             )}
 
-            {/* Lista delle domande */}
+            {/* Questions list */}
             {selectedCategory && (
             <ScrollView style={styles.questionsListContainer}>
               {QUESTION_CATEGORIES.find(c => c.id === selectedCategory)?.questions.map(

@@ -28,7 +28,7 @@ export default function TransactionModal({
     const [amount, setAmount] = useState("");
     const [date, setDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [isIncome, setIsIncome] = useState(false); // true = entrata, false = uscita
+    const [isIncome, setIsIncome] = useState(false); // true = income, false = expense
 
     const { t } = useTranslation();
 
@@ -38,19 +38,17 @@ export default function TransactionModal({
             setCategory(transaction.category);
             setAmount(Math.abs(transaction.amount).toString());
             setDate(new Date(transaction.date || Date.now()));
-            setIsIncome(transaction.amount > 0); // Se amount è positivo, è un'entrata
+            setIsIncome(transaction.amount > 0); // If amount is positive, it's an income
         } else {
             setName("");
             setCategory("Clothing");
             setAmount("");
             setDate(new Date());
-            setIsIncome(false); // Default: uscita
+            setIsIncome(false); // Default: expense
         }
         setShowDatePicker(false);
     }, [transaction, visible]);
 
-    // Quando cambia isIncome o cambiano le mappe delle categorie, assicuriamoci
-    // che la categoria selezionata esista nel set corrente; altrimenti selezioniamo il primo.
     useEffect(() => {
         const currentIcons = isIncome ? (incomeCategoryIcons || {}) : (categoryIcons || {});
         const keys = Object.keys(currentIcons);
@@ -209,9 +207,7 @@ export default function TransactionModal({
                                         placeholder="0"
                                         value={amount}
                                         onChangeText={(text) => {
-                                            // Consenti solo numeri e punto decimale
                                             let filtered = text.replace(/[^0-9.]/g, '');
-                                            // Consenti solo un punto decimale
                                             const parts = filtered.split('.');
                                             if (parts.length > 2) {
                                                 filtered = parts[0] + '.' + parts.slice(1).join('');

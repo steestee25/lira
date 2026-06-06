@@ -89,13 +89,8 @@ export async function clearProficiencyLevel(): Promise<void> {
   }
 }
 
-/**
- * Carica il proficiency level direttamente da Supabase (ignora cache)
- * Dopo il fetch da DB, salva in cache per future richieste
- */
 export async function loadProficiencyLevelWithFallback(): Promise<string | null> {
   try {
-    // Carica direttamente da Supabase dal profilo utente
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
       console.warn('Impossibile ottenere user ID:', authError?.message)

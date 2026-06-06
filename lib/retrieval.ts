@@ -1,4 +1,3 @@
-// ─── retrieval.ts ─────────────────────────────────────────────────────────────
 // Retrieves relevant documents from the knowledge base using BM25.
 
 import * as bm25 from './bm25Index';
@@ -7,7 +6,6 @@ import { KNOWLEDGE_BASE } from './knowledgeBase_qa';
 let RNFS: any = null;
 try { RNFS = require('react-native-fs'); } catch { /* not available on web */ }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 export type Doc = {
   id:       string;
@@ -26,18 +24,15 @@ type DiskCache = {
   bm25Index:  bm25.BM25Index;
 };
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 
 const CACHE_VERSION   = 1;
 const CACHE_FILE      = RNFS
   ? `${RNFS.DocumentDirectoryPath}/bm25_index.json`
   : null;
 
-// ─── In-memory state ──────────────────────────────────────────────────────────
 
 let indexedDocs: Doc[] | null = null;
 
-// ─── Knowledge base loader ───────────────────────────────────────────────────
 
 function loadDocs(): Doc[] {
   return KNOWLEDGE_BASE.map(e => ({
@@ -51,7 +46,6 @@ function loadDocs(): Doc[] {
   }));
 }
 
-// ─── Fingerprint ─────────────────────────────────────────────────────────────
 // Changes whenever knowledge base content changes → cache invalidation.
 
 function fingerprint(docs: Doc[]): string {
@@ -63,8 +57,6 @@ function fingerprint(docs: Doc[]): string {
   return h.toString(36);
 }
 
-// ─── Index management ─────────────────────────────────────────────────────────
-
 /**
  * Ensures the BM25 index is ready.
  *
@@ -74,13 +66,11 @@ function fingerprint(docs: Doc[]): string {
  *   3. Build from scratch + write cache to disk.
  */
 export async function ensureIndexed(): Promise<Doc[]> {
-  // 1. Already ready
   if (indexedDocs && bm25.isReady()) return indexedDocs;
 
   const docs = loadDocs();
   const fp   = fingerprint(docs);
 
-  // 2. Try disk cache
   if (RNFS && CACHE_FILE) {
     try {
       const exists = await RNFS.exists(CACHE_FILE);
@@ -94,7 +84,6 @@ export async function ensureIndexed(): Promise<Doc[]> {
           return indexedDocs;
         }
 
-        // stale cache
         console.log('[BM25] Cache stale, rebuilding');
         await RNFS.unlink(CACHE_FILE).catch(() => {});
       }
@@ -103,11 +92,9 @@ export async function ensureIndexed(): Promise<Doc[]> {
     }
   }
 
-  // 3. Build from scratch
   bm25.buildIndex(docs.map(d => d.text));
   console.log(`[BM25] Index built for ${docs.length} documents`);
 
-  // Persist
   if (RNFS && CACHE_FILE) {
     try {
       const cache: DiskCache = {
@@ -127,8 +114,6 @@ export async function ensureIndexed(): Promise<Doc[]> {
   return docs;
 }
 
-// ─── Retrieval ────────────────────────────────────────────────────────────────
-
 export async function retrieveRelevant(
   query:   string,
   options: { k?: number; minScore?: number } = {},
@@ -141,11 +126,9 @@ export async function retrieveRelevant(
   const queryTerms = bm25.tokenize(query);
   if (!queryTerms.length) return [];
 
-  // Score only documents that share at least one term with the query (inverted index)
   const scoreMap = bm25.scoreAll(queryTerms);
   if (!scoreMap.size) return [];
 
-  // Sort by score descending
   const ranked = Array.from(scoreMap.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, k);
@@ -154,7 +137,6 @@ export async function retrieveRelevant(
     ? ranked.filter(([, s]) => s >= minScore)
     : ranked;
 
-  // Guarantee at least 3 results so the LLM always has context
   const final = filtered.length >= 3 ? filtered : ranked.slice(0, Math.min(3, ranked.length));
 
   console.log(`[BM25] query="${query}" terms=[${queryTerms.join(', ')}]`);

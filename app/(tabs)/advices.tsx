@@ -37,8 +37,6 @@ if (Platform.OS !== 'web') {
   releaseAllLlama = llamaModule.releaseAllLlama
 }
 
-// ─── Constants ───────────────────────────────────────────────────────────────
-
 const MODEL_FILENAME = 'gemma-3-1b-it-Q8_0.gguf'
 const MODEL_DOWNLOAD_URL =
   'https://huggingface.co/unsloth/gemma-3-1b-it-GGUF/resolve/main/gemma-3-1b-it-Q8_0.gguf'
@@ -49,8 +47,6 @@ interface Advice {
   text: string
   category: string
 }
-
-// ─── Utility functions ──────────────────────────────────────────────────────
 
 const appendHexOpacity = (hex: string, alpha = '20') => {
   if (!hex || typeof hex !== 'string') return hex
@@ -80,8 +76,6 @@ const STATIC_ADVICES: Advice[] = [
   },
 ]
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
 /**
  * Strip markdown code fences (```json ... ``` or ``` ... ```) from model output.
  */
@@ -90,73 +84,6 @@ function stripCodeFences(raw: string): string {
     .replace(/^```[a-z]*\n?/i, '')
     .replace(/\n?```$/i, '')
     .trim()
-}
-
-/**
- * Normalise a single raw item coming from the model into our Advice shape.
- * The model may output { text, category }, { advice, category }, or { text, description, category }.
- */
-function normaliseItem(item: any): Advice | null {
-  if (!item || typeof item !== 'object') return null
-  const text: string = item.text ?? item.advice ?? item.description ?? ''
-  const category: string = item.category ?? item.categoria ?? ''
-  if (!text) return null
-  return { text: text.trim(), category: category.trim() }
-}
-
-/**
- * Parse JSON with duplicate "advice" keys within category objects.
- * Input format:
- * { "Category1": { "advice": "...", "advice": "...", "advice": "..." }, "Category2": { ... } }
- *
- * Strategy: rename all "advice" keys globally to "advice_0", "advice_1", etc.
- * then parse and extract.
- */
-function extractCategoryAdviceFromMalformed(raw: string): Advice[] {
-  let repaired = raw
-
-  // Rename duplicate "advice" keys to "advice_0", "advice_1", etc.
-  let adviceCounter = 0
-  repaired = repaired.replace(/"advice"\s*:/g, () => {
-    const key = `"advice_${adviceCounter}"`
-    adviceCounter++
-    return key + ':'
-  })
-
-  // Add missing closing braces
-  let opens = (repaired.match(/\{/g) || []).length
-  let closes = (repaired.match(/\}/g) || []).length
-  if (opens > closes) {
-    repaired = repaired + '}'.repeat(opens - closes)
-  }
-
-  console.log('[Parse] repaired JSON (first 200 chars):', repaired.substring(0, 200))
-
-  // Try to parse
-  let parsed: any
-  try {
-    parsed = JSON.parse(repaired)
-  } catch (e) {
-    console.warn('[Parse] JSON parse failed after repair:', e, 'input:', repaired.substring(0, 300))
-    return []
-  }
-
-  // Extract advices from parsed JSON
-  const result: Advice[] = []
-  for (const [category, block] of Object.entries(parsed)) {
-    if (!block || typeof block !== 'object') continue
-
-    const blockObj = block as Record<string, any>
-    // Collect all advice_* values (they're now renamed from duplicate "advice" keys)
-    for (const [key, value] of Object.entries(blockObj)) {
-      if ((key === 'advice' || key.startsWith('advice_')) && typeof value === 'string' && value.trim()) {
-        result.push({ category: category.trim(), text: value.trim() })
-      }
-    }
-  }
-
-  console.log('[Parse] extracted', result.length, 'advices from', new Set(result.map(r => r.category)).size, 'categories')
-  return result
 }
 
 /**
@@ -238,36 +165,6 @@ function tryParseAdvices(raw: string): Advice[] {
   return results
 }
 
-/**
- * Best-effort JSON repair for common model output mistakes:
- * - Duplicate "advice" keys inside an object (model repeats the key) — rename to advice_0, advice_1...
- * - Missing closing braces
- */
-function tryRepairAndParse(raw: string): any | null {
-  try {
-    let counter = 0
-    const deduped = raw.replace(/"advice"\s*:/g, () => {
-      const key = `"advice_${counter}":`
-      counter++
-      return key
-    })
-    return JSON.parse(deduped)
-  } catch { }
-
-  try {
-    let s = raw.trim()
-    const opens = (s.match(/\{/g) || []).length
-    const closes = (s.match(/\}/g) || []).length
-    const missing = opens - closes
-    if (missing > 0) s = s + '}'.repeat(missing)
-    return JSON.parse(s)
-  } catch { }
-
-  return null
-}
-
-// ─── Component ───────────────────────────────────────────────────────────────
-
 export default function Advices() {
   const { session, loading: authLoading } = useAuth()
   const { t, locale } = useTranslation()
@@ -296,8 +193,6 @@ export default function Advices() {
   const categoryColors: Record<string, string[]> = Object.fromEntries(
     Object.entries(categoriesFromLocale).map(([k, v]) => [k, [v.color, v.color]])
   )
-
-  // ─── Helper functions ──────────────────────────────────────────────────────
 
   const getCategoryKeyFromLabel = (label: string) => {
     if (!label) return null
@@ -345,7 +240,6 @@ export default function Advices() {
     }
   }
 
-  // ─── Model init ────────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (Platform.OS === 'web' || isInitializedRef.current) return
@@ -355,7 +249,7 @@ export default function Advices() {
 
   const getModelPath = () => `${RNFS.DocumentDirectoryPath}/${MODEL_FILENAME}`
 
-  const MIN_MODEL_SIZE = 500_000_000 // 500 MB — soglia minima ragionevole
+  const MIN_MODEL_SIZE = 500_000_000 
 
   const initModel = async () => {
     setModelLoading(true)
@@ -381,7 +275,7 @@ export default function Advices() {
         const dl = await RNFS.downloadFile({
           fromUrl: MODEL_DOWNLOAD_URL,
           toFile: path,
-          progressDivider: 5, // callback ogni 5% invece che ogni byte
+          progressDivider: 5, 
           begin: (res: any) => {
             console.log('[Model] download started — expected size:', res.contentLength, 'bytes')
             setStatusText('Download: 0%')
@@ -450,8 +344,6 @@ export default function Advices() {
       setModelLoading(false)
     }
   }
-
-  // ─── Data fetch + advice generation ────────────────────────────────────────
 
   useEffect(() => {
     if (!authLoading && session?.user) {
@@ -557,24 +449,13 @@ export default function Advices() {
       .map((c: any) => `${c.category} €${c.total} (${c.pct}%)`)
       .join(', ')
 
-    // Show a fully-worked example with DIFFERENT numbers so the model generates
-    // real advice instead of copying the placeholder text.
     return (
       `<start_of_turn>user\n` +
-      //`Sei un consulente finanziario personale. Analizza le spese e genera 3 consigli pratici in italiano.\n` +
-      //`Rispondi ESCLUSIVAMENTE con un array JSON. Niente testo, niente markdown, niente spiegazioni.\n\n` +
-      //`ESEMPIO DI FORMATO (dati inventati, solo per il formato):\n` +
-      //`Input: Ristorante €120 (40%), Abbigliamento €90 (30%), Trasporti €90 (30%), totale €300\n` +
-      //`Output: [{"text":"Cucinare a casa 3 sere a settimana ti farebbe risparmiare circa €36 al mese sul ristorante.","category":"Ristorante"},{"text":"Prima di comprare vestiti nuovi controlla l'armadio: potresti risparmiare €27 al mese.","category":"Abbigliamento"},{"text":"Con l'abbonamento mensile ai trasporti invece dei biglietti singoli risparmieresti €18 al mese.","category":"Trasporti"}]\n\n` +
-      //`ORA ANALIZZA QUESTI DATI REALI e genera 3 consigli specifici con cifre reali:\n` +
-      //`Periodo: ${summary.period} — Totale speso: €${summary.total}\n` +
       `Sei un consulente finanziario personale. Analizza le spese e genera 3 consigli pratici in italiano per le 
       diverse categorie.\n` +
       `Categorie: ${cats}\n` +
       `Genera un unico file JSON per le categorie elencate.\n` +
       `Esempio formato della risposta: {"category": "Electronics", "advices": [{"text": "Il 65% delle spese è destinato all'acquisto di elettronica, stabilisci un budget massimo per gli acquisti di elettronica."}, {"text": "Considera l'usato o il ricondizionamento per risparmiare.  Fai attenzione alle offerte e agli sconti"}, {"text": "Valuta se puoi dispositivi nuovi o ricondizionati per spendere meno"}]}, "category": "Car", "advices": [{"text": "Le spese per "Car" rappresentano il 13% delle tue spese.  È consigliabile monitorare l'utilizzo del veicolo e valutare se è necessario un nuovo modello o se puoi ottimizzare i consumi per ridurre i costi.  Considera l'acquisto di un'auto usata per risparmiare."}, {"text": "Considera l'usato o il ricondizionamento per risparmiare.  Fai attenzione alle offerte e agli sconti"}, {"text": "Valuta se puoi dispositivi nuovi o ricondizionati per spendere meno"}]}\n` +
-      //`Esempio formato della risposta: {"category": "Electronics", {"advice": "Il 65% delle spese è destinato all'acquisto di elettronica, stabilisci un budget massimo per gli acquisti di elettronica.", "advice": "Considera l'usato o il ricondizionamento per risparmiare.  Fai attenzione alle offerte e agli sconti", "advice": "Valuta se puoi dispositivi nuovi o ricondizionati per spendere meno"}, "category": "Car", {"advice": "Le spese per "Car" rappresentano il 13% delle tue spese.  È consigliabile monitorare l'utilizzo del veicolo e valutare se è necessario un nuovo modello o se puoi ottimizzare i consumi per ridurre i costi.  Considera l'acquisto di un'auto usata per risparmiare.", "advice": "Considera l'usato o il ricondizionamento per risparmiare.  Fai attenzione alle offerte e agli sconti", "advice": "Valuta se puoi dispositivi nuovi o ricondizionati per spendere meno"}, "advice": "Se hai già un'auto, controlla regolarmente le riparazioni e la manutenzione per evitare costi imprevisti.  Valuta l'acquisto di un'assicurazione auto più economica o l'utilizzo di mezzi pubblici per le brevi distanze.",
-      //"advice": "Se hai un budget limitato, potresti considerare l'utilizzo di mezzi pubblici o la bicicletta per spostamenti brevi."}\n` +
       `<end_of_turn>\n` +
       `<start_of_turn>model\n`
     )
@@ -698,8 +579,6 @@ export default function Advices() {
 
     return `${formatDate(start)} - ${formatDate(end)}`
   }
-
-  // ─── Render ─────────────────────────────────────────────────────────────────
 
   if (authLoading) {
     return (

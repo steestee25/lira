@@ -174,9 +174,6 @@ export default function Chat(): React.JSX.Element {
     },
   ];
 
-  //const MODEL_ALIAS = 'Smollm3-3B-q4';
-  //const MODEL_REPO = 'Stee201/gguf-server-smollm3';
-  //const MODEL_CACHE_NAME = 'smollm3-custom.q4_k_m.gguf';
   const MODEL_ALIAS = 'Gemma3-1B-Mine';
   const MODEL_REPO = 'Stee201/gguf-server-q';
   const MODEL_CACHE_NAME = 'Gemma3-1B-Mine.gguf';
@@ -461,23 +458,6 @@ export default function Chat(): React.JSX.Element {
           ${safeRetrievedText}
           ${getProficiencyInstruction()}`;
 
-        //systemMessage = `Sei un assistente esperto di finanza personale che risponde ESCLUSIVAMENTE sulla base dei documenti forniti.
-        //${getProficiencyInstruction()}
-        //GUARDRAILS OBBLIGATORI:
-        //- Se la domanda non riguarda la finanza personale o gli argomenti nei documenti, dì che non puoi rispondere
-        //- Non dare MAI consigli di investimenti finanziari specifici (es: "compra questo", "vendi quello")
-        //- Fornisci solo informazioni educative sulla finanza
-        //REGOLE OBBLIGATORIE:
-        //1. RIPETI letteralmente dai documenti
-        //2. NON INVENTARE NULLA che non sia nei documenti  
-        //3. Se un documento dice X, ripeti esattamente X
-        //4. La risposta DEVE essere COMPLETA - copia TUTTI i dettagli disponibili
-        //5. Rispondi in ITALIANO usando la massima lunghezza possibile
-        //6. GENERA la risposta in base al livello di competenza dell'utente (base, intermedio, avanzato) - vedi istruzioni sopra
-        //DOCUMENTI DISPONIBILI:
-        //${safeRetrievedText}
-        //
-        //RISPOSTA: `;
       }
 
       messagesForModel.push({ role: 'system', content: systemMessage });
@@ -584,7 +564,7 @@ export default function Chat(): React.JSX.Element {
         use_mlock: true,
         n_ctx: 2048,      // was 4096 — halved, loads faster
         n_gpu_layers: 1,
-        n_threads: 4,     // add this — helps on mobile CPUs
+        n_threads: 4,     
       });
 
       console.log('[LoadModel] Success! Context created');
@@ -627,7 +607,7 @@ export default function Chat(): React.JSX.Element {
 
         {!isPreparingModel && !isInitializingModels && currentPage === 'conversation' && context && (
           <>
-            {/* Chip delle categorie */}
+            {/* Categorie chips */}
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -772,7 +752,7 @@ export default function Chat(): React.JSX.Element {
               </View>
             </Modal>
 
-            {/* Modal per visualizzare le domande della categoria */}
+            {/* Modal for category questions */}
             <Modal
               visible={showQuestionsModal}
               animationType="fade"
@@ -796,7 +776,7 @@ export default function Chat(): React.JSX.Element {
                   activeOpacity={1}
                   onPress={() => { }}
                 >
-                  {/* Header del modal */}
+                  {/* Modal header */}
                   {selectedCategory && QUESTION_CATEGORIES.find(c => c.id === selectedCategory) && (
                     <View style={appStyles.modalHeader}>
                       <View style={appStyles.headerWithBadge}>
@@ -821,7 +801,7 @@ export default function Chat(): React.JSX.Element {
                     </View>
                   )}
 
-                  {/* Lista delle domande */}
+                  {/* Questions list */}
                   {selectedCategory && (
                     <ScrollView style={appStyles.questionsListContainer}>
                       {QUESTION_CATEGORIES.find(c => c.id === selectedCategory)?.questions.map(

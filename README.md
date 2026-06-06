@@ -72,7 +72,7 @@ LIRA consists of three main components:
 
 **3. Cross-Platform Application** - A sequential pipeline connecting user onboarding → conversational RAG assistance → financial tracking and analysis.
 
-The RAG pipeline perform retrieval over the CONSOB corpus and injects the top-k passages as context before generation.
+The RAG pipeline perform retrieval using BM25 over the CONSOB corpus and injects the top-k passages as context before generation.
 
 ## 🚀 Installation
 
@@ -186,7 +186,7 @@ lira/
 │   ├── transactions.tsx         # Transaction management
 │   ├── transactionsOffline.tsx  # Offline sync
 │   ├── docStore.ts              # Document index and vector store
-│   ├── knowledgeBase.tsx        # CONSOB knowledge base (RAG)
+│   ├── knowledgeBase_qs.tsx     # CONSOB knowledge base (RAG)
 │   ├── i18n.tsx                 # Language localization
 │   ├── offlineStorage.tsx       # Offline storage
 │   ├── modelStorage.ts          # SLM model storage

@@ -1,6 +1,4 @@
-// ─── bm25Index.ts ─────────────────────────────────────────────────────────────
 // BM25 with an inverted index: term → [{docIdx, tf}]
-// No embeddings, no dense vectors, no cosine similarity.
 
 const STOP_WORDS = new Set([
   'il','lo','la','i','gli','le',
@@ -28,13 +26,12 @@ const STOP_WORDS = new Set([
 const K1 = 1.5;
 const B  = 0.75;
 
-// Posting: one entry per document that contains the term
 type Posting = { docIdx: number; tf: number };
 
 export type BM25Index = {
-  invertedIndex: Record<string, Posting[]>; // term → postings
-  idf:           Record<string, number>;    // term → IDF value
-  docLengths:    number[];                  // token count per document
+  invertedIndex: Record<string, Posting[]>; 
+  idf:           Record<string, number>;    
+  docLengths:    number[];                  
   avgDocLength:  number;
   numDocs:       number;
 };
@@ -62,7 +59,6 @@ export function tokenize(text: string): string[] {
 export function buildIndex(docs: string[]): void {
   const N = docs.length;
   const docLengths: number[] = [];
-  // term → Map<docIdx, tf>
   const postingMap: Record<string, Map<number, number>> = {};
 
   for (let docIdx = 0; docIdx < docs.length; docIdx++) {
@@ -77,7 +73,6 @@ export function buildIndex(docs: string[]): void {
 
   const avgDocLength = docLengths.reduce((s, l) => s + l, 0) / (N || 1);
 
-  // Convert posting maps to arrays and compute IDF
   const invertedIndex: Record<string, Posting[]> = {};
   const idf: Record<string, number> = {};
 
@@ -94,12 +89,10 @@ export function buildIndex(docs: string[]): void {
 
 /**
  * Returns BM25 scores for ALL documents that match at least one query term.
- * Only iterates over posting lists of query terms — O(matches), not O(N·|query|).
+ * Only iterates over posting lists of query terms.
  */
 export function scoreAll(queryTerms: string[]): Map<number, number> {
   const scores = new Map<number, number>();
-  // Deduplicate: a term appearing multiple times in the query shouldn't
-  // cause its posting list to be traversed more than once.
   queryTerms = [...new Set(queryTerms)];
 
   for (const term of queryTerms) {

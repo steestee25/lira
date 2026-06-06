@@ -193,11 +193,10 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
 
-  // Blocco (titolo + input + bottoni) che parte più in basso
   animatedBlock: {
     width: '100%',
     alignItems: 'center',
-    paddingTop: 60, // parte più giù rispetto alla freccia
+    paddingTop: 60, 
   },
 
   title: {

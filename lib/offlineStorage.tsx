@@ -5,7 +5,7 @@ const OFFLINE_TRANSACTIONS_KEY = 'offline_transactions';
 const SYNC_QUEUE_KEY = 'sync_queue';
 
 /**
- * Salva una transazione offline usando AsyncStorage
+ * Save a transaction offline, to be synced later when online
  */
 export const saveTransactionOffline = async (
   transaction: DBTransaction
@@ -30,7 +30,7 @@ export const saveTransactionOffline = async (
 };
 
 /**
- * Recupera tutte le transazioni offline
+ * Fetch all offline transactions for a given user
  */
 export const getOfflineTransactions = async (userId: string): Promise<DBTransaction[]> => {
   try {
@@ -50,7 +50,7 @@ export const getOfflineTransactions = async (userId: string): Promise<DBTransact
 };
 
 /**
- * Recupera una singola transazione offline per id
+ * Fetch a single offline transaction by ID
  */
 export const getOfflineTransactionById = async (transactionId: string): Promise<DBTransaction | null> => {
   try {
@@ -67,7 +67,7 @@ export const getOfflineTransactionById = async (transactionId: string): Promise<
 };
 
 /**
- * Aggiunge un'operazione alla coda di sincronizzazione
+ * Add an operation to the synchronization queue
  */
 export const addToSyncQueue = async (
   transactionId: string,
@@ -97,7 +97,7 @@ export const addToSyncQueue = async (
 };
 
 /**
- * Recupera la coda di sincronizzazione
+ * Fetch the synchronization queue
  */
 export const getPendingSyncQueue = async (): Promise<any[]> => {
   try {
@@ -113,7 +113,7 @@ export const getPendingSyncQueue = async (): Promise<any[]> => {
 };
 
 /**
- * Rimuove un'operazione dalla coda di sincronizzazione
+ * Remove an item from the synchronization queue by its ID
  */
 export const removeSyncQueueItem = async (queueItemId: string): Promise<boolean> => {
   try {
@@ -134,7 +134,7 @@ export const removeSyncQueueItem = async (queueItemId: string): Promise<boolean>
 };
 
 /**
- * Elimina una transazione offline
+ * Delete an offline transaction by ID
  */
 export const deleteTransactionOffline = async (transactionId: string): Promise<boolean> => {
   try {
@@ -158,7 +158,7 @@ export const deleteTransactionOffline = async (transactionId: string): Promise<b
 };
 
 /**
- * Pulisce la coda di sincronizzazione per una transazione
+ * Clear the synchronization queue for a specific transaction (e.g., after successful sync)
  */
 export const clearSyncQueueForTransaction = async (transactionId: string): Promise<boolean> => {
   try {

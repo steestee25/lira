@@ -6,7 +6,7 @@ const TRANSACTIONS_TABLE = 'offline_transactions';
 const SYNC_QUEUE_TABLE = 'sync_queue';
 
 /**
- * Inizializza il database SQLite
+ * Initialize the SQLite database and create necessary tables if they don't exist
  */
 export const initializeDatabase = async () => {
   try {
@@ -27,7 +27,7 @@ export const initializeDatabase = async () => {
       );
     `);
 
-    // Crea la tabella per la coda di sincronizzazione
+    // Create table for synchronization queue
     await db.execAsync(`
       CREATE TABLE IF NOT EXISTS ${SYNC_QUEUE_TABLE} (
         id TEXT PRIMARY KEY,
@@ -48,14 +48,14 @@ export const initializeDatabase = async () => {
 };
 
 /**
- * Ottiene l'istanza del database
+ * Obtain a database connection instance
  */
 export const getDatabase = async () => {
   return await SQLite.openDatabaseAsync(DATABASE_NAME);
 };
 
 /**
- * Salva una transazione in SQLite (offline)
+ * Save a transaction offline )
  */
 export const saveTransactionOffline = async (
   transaction: DBTransaction
@@ -89,7 +89,7 @@ export const saveTransactionOffline = async (
 };
 
 /**
- * Aggiunge un'operazione alla coda di sincronizzazione
+ * Add an operation to the synchronization queue
  */
 export const addToSyncQueue = async (
   transactionId: string,
@@ -123,7 +123,7 @@ export const addToSyncQueue = async (
 };
 
 /**
- * Recupera tutte le transazioni salvate offline
+ * Fetch all offline transactions for a given user
  */
 export const getOfflineTransactions = async (userId: string): Promise<DBTransaction[]> => {
   try {
@@ -142,7 +142,7 @@ export const getOfflineTransactions = async (userId: string): Promise<DBTransact
 };
 
 /**
- * Recupera la coda di sincronizzazione non sincronizzata
+ * Fetch the synchronization queue with pending operations
  */
 export const getPendingSyncQueue = async (): Promise<any[]> => {
   try {
@@ -160,7 +160,7 @@ export const getPendingSyncQueue = async (): Promise<any[]> => {
 };
 
 /**
- * Marca una transazione come sincronizzata
+ * Set a transaction as synced after successful synchronization with the server
  */
 export const markTransactionAsSynced = async (transactionId: string): Promise<boolean> => {
   try {
@@ -179,7 +179,7 @@ export const markTransactionAsSynced = async (transactionId: string): Promise<bo
 };
 
 /**
- * Marca un'operazione di sync queue come completata
+ * Set a synchronization queue item as synced
  */
 export const markSyncQueueItemAsSynced = async (queueItemId: string): Promise<boolean> => {
   try {
@@ -198,7 +198,7 @@ export const markSyncQueueItemAsSynced = async (queueItemId: string): Promise<bo
 };
 
 /**
- * Elimina una transazione dal database locale
+ * Delete an offline transaction by ID
  */
 export const deleteTransactionOffline = async (transactionId: string): Promise<boolean> => {
   try {
@@ -217,7 +217,7 @@ export const deleteTransactionOffline = async (transactionId: string): Promise<b
 };
 
 /**
- * Cancella la coda di sincronizzazione per una transazione
+ * Clear the synchronization queue for a specific transaction (e.g., after successful sync)
  */
 export const clearSyncQueueForTransaction = async (transactionId: string): Promise<boolean> => {
   try {
