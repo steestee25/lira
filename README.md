@@ -348,20 +348,6 @@ For issues, suggestions, or questions:
 - 💬 Contact via email
 - 🌟 If you found this project useful, please leave a star ⭐
 
-## 📖 Citation
-
-If you use LIRA in your research, please cite:
-
-```bibtex
-@inproceedings{molari2026lira,
-  title     = {LIRA: a Personal Finance Chatbot for Italian Language},
-  author    = {Molari, Stefano and Braga, Marco and Pasi, Gabriella},
-  booktitle = {Proceedings of the 35th ACM International Conference on Information and Knowledge Management (CIKM '26)},
-  year      = {2026},
-  location  = {Rome, Italy},
-  doi       = {XXXXXXX.XXXXXXX}
-}
-```
 
 ## 🙏 Acknowledgments
 
