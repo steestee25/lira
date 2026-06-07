@@ -10,7 +10,7 @@ A cross-platform personal finance assistant combining on-device Small Language M
 
 ## 🌐 Live Application
 
-[Try LIRA live!](https://lira--p7yl6268qj.expo.app)
+[Try LIRA live!](https://lira-web.expo.app/)
 
 A pre-populated reviewer account is available. On the login page, use the dedicated button or sign in with email using the following credentials:
 
