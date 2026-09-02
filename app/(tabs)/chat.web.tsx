@@ -18,6 +18,7 @@ import ChatScreen from '@/components/ChatScreen';
 import { Source, SourcesDisplay } from '@/components/SourcesDisplay';
 import { COLORS } from '@/constants/color';
 import { useTranslation } from '@/lib/i18n';
+import { PROFICIENCY_LEVELS, ProficiencyLevel } from './_layout';
 
 type Message = {
   role: 'system' | 'user' | 'assistant';
@@ -128,11 +129,12 @@ async function callModel(
   conversation: Message[],
   endpoint: ModelChoice,
   ragEnabled: boolean,
+  proficiencyLevel: ProficiencyLevel,
   query?: string,
   onPhaseChange?: (phase: AnimationPhase) => void
 ) {
 
-  console.log("RAG ENABLED:", ragEnabled);
+  console.log("RAG ENABLED:", ragEnabled, "LEVEL:", proficiencyLevel);
   const messages = conversation.filter(m => m.role !== 'system');
 
   const url = ragEnabled
@@ -145,7 +147,7 @@ async function callModel(
       query: query ?? messages[messages.length - 1]?.content,
       k: 6,
       min_score: 0.05,
-      proficiency_level: "intermediate",
+      proficiency_level: proficiencyLevel,
     }
     : { messages };
 
@@ -202,7 +204,7 @@ type ModelChoice = 'call_gemma_1b' | 'call_gemma_270m' | 'call_smollm3';
 
 export default function Chat(): React.JSX.Element {
 
-  const { rag, resetMessages } = useLocalSearchParams();
+  const { rag, level, resetMessages } = useLocalSearchParams();
   const { locale, t } = useTranslation();
 
   const INITIAL_CONVERSATION: Message[] = [
@@ -240,6 +242,7 @@ export default function Chat(): React.JSX.Element {
   const [currentSources, setCurrentSources] = useState<Source[]>([]);
   const [showSourcesModal, setShowSourcesModal] = useState<boolean>(false);
   const [ragEnabled, setRagEnabled] = useState<boolean>(false);
+  const [proficiencyLevel, setProficiencyLevel] = useState<ProficiencyLevel>('intermediate');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showQuestionsModal, setShowQuestionsModal] = useState<boolean>(false);
 
@@ -251,6 +254,14 @@ export default function Chat(): React.JSX.Element {
     console.log("DEBUG RAG - ragParam:", ragParam, "isEnabled:", isEnabled);
     setRagEnabled(isEnabled);
   }, [rag]);
+
+  // Aggiorna il livello di competenza dell'utente quando level cambia
+  useEffect(() => {
+    const levelParam = Array.isArray(level) ? level[0] : level;
+    if (PROFICIENCY_LEVELS.includes(levelParam as ProficiencyLevel)) {
+      setProficiencyLevel(levelParam as ProficiencyLevel);
+    }
+  }, [level]);
 
   // Listen for reset messages from header button
   useEffect(() => {
@@ -292,7 +303,7 @@ export default function Chat(): React.JSX.Element {
     setAnswerPhase('fetching');
 
     try {
-      const data = await callModel(updatedConversation, selectedModel, ragEnabled, undefined, setAnswerPhase);
+      const data = await callModel(updatedConversation, selectedModel, ragEnabled, proficiencyLevel, undefined, setAnswerPhase);
 
       const sources: Source[] = data.sources ? data.sources.map((source: any, idx: number) => ({
         id: source.id || `[${idx + 1}]`,
